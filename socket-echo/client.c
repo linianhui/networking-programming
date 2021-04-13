@@ -12,7 +12,7 @@
 int main(int argc, char **argv)
 {
     int connect_fd;
-    
+
     struct sockaddr_in server_address;
 
     connect_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -22,8 +22,10 @@ int main(int argc, char **argv)
     server_address.sin_port = htons(SERVER_PORT);
 
     inet_pton(AF_INET, "127.0.0.1", &(server_address.sin_addr));
+    printf("client srart\n");
 
     connect(connect_fd, (struct sockaddr *)&server_address, sizeof(server_address));
+    printf("cconnected to server 127.0.0.1:12345 ...\n");
 
     char read_buffer[BUFFER_SIZE];
     char write_buffer[BUFFER_SIZE];
