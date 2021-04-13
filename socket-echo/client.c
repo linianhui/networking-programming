@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define SERVER_PORT 12345
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 128
 
 int main(int argc, char **argv)
 {
@@ -36,7 +37,7 @@ int main(int argc, char **argv)
         fgets(write_buffer, BUFFER_SIZE, stdin);
         write(connect_fd, write_buffer, strlen(write_buffer) + 1);
         read(connect_fd, read_buffer, BUFFER_SIZE);
-        printf("server echo:\n%s", read_buffer);
+        printf("server echo:\n%s\n", read_buffer);
     }
     close(connect_fd);
 }

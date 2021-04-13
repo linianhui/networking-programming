@@ -5,19 +5,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define LISTEN_PORT 12345
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 128
 
 void echo(int connect_fd, struct sockaddr_in *client_address)
 {
+    pid_t pid = getpid();
     char buffer[BUFFER_SIZE];
     bzero(buffer, sizeof(buffer));
 
     char *client_ip = inet_ntoa(client_address->sin_addr);
     in_port_t client_port = client_address->sin_port;
 
-    printf("client %s:%d connected\n", client_ip, client_port);
+    printf("\nclient %s:%d connected\n", client_ip, client_port);
+    printf("server pid=%d handler\n", pid);
 
     int read_size;
     while ((read_size = read(connect_fd, buffer, sizeof(buffer))) != 0)
@@ -25,10 +28,10 @@ void echo(int connect_fd, struct sockaddr_in *client_address)
         printf("client %s:%d send\n%s\n", client_ip, client_port, buffer);
         if (write(connect_fd, buffer, read_size + 1) > 0)
         {
-            printf("server echo:\n%s\n", buffer);
+            printf("server pid=%d echo:\n%s\n", pid, buffer);
         }
     }
-    close(connect_fd);
+    printf("server pid=%d close connect\n", pid);
 }
 
 int main()
@@ -59,7 +62,8 @@ int main()
         perror("listen error");
         return 3;
     }
-    printf("server srart\nwaiting for client connect...\n");
+    pid_t pid = getpid();
+    printf("server srart pid=%d\nwaiting for client connect...\n", pid);
 
     int connect_fd;
     struct sockaddr_in client_address;
@@ -72,7 +76,14 @@ int main()
             perror("accept error");
             return 4;
         }
-        echo(connect_fd, &client_address);
+        int childPid;
+        if ((childPid = fork()) == 0)
+        {
+            close(listen_fd);
+            echo(connect_fd, &client_address);
+            exit(0);
+        }
+        close(connect_fd);
     }
     close(listen_fd);
     return 0;
