@@ -9,6 +9,28 @@
 #define LISTEN_PORT 12345
 #define BUFFER_SIZE 1024
 
+void echo(int connect_fd, struct sockaddr_in *client_address)
+{
+    char buffer[BUFFER_SIZE];
+    bzero(buffer, sizeof(buffer));
+
+    char *client_ip = inet_ntoa(client_address->sin_addr);
+    in_port_t client_port = client_address->sin_port;
+
+    printf("client %s:%d connected\n", client_ip, client_port);
+
+    int read_size;
+    while ((read_size = read(connect_fd, buffer, sizeof(buffer))) != 0)
+    {
+        printf("client %s:%d send\n%s\n", client_ip, client_port, buffer);
+        if (write(connect_fd, buffer, read_size + 1) > 0)
+        {
+            printf("server echo:\n%s\n", buffer);
+        }
+    }
+    close(connect_fd);
+}
+
 int main()
 {
     struct sockaddr_in server_address;
@@ -41,36 +63,16 @@ int main()
 
     int connect_fd;
     struct sockaddr_in client_address;
-    socklen_t client_length=sizeof(client_address);
-    char buffer[BUFFER_SIZE];
+    socklen_t client_length = sizeof(client_address);
+
     while (1)
     {
-
         if ((connect_fd = accept(listen_fd, (struct sockaddr *)&client_address, &client_length)) < 0)
         {
             perror("accept error");
             return 4;
         }
-
-        char *client_ip = inet_ntoa(client_address.sin_addr);
-        in_port_t client_port = client_address.sin_port;
-
-        printf("client %s:%d connected\n", client_ip, client_port);
-
-        bzero(buffer, sizeof(buffer));
-        int read_size;
-        if ((read_size = read(connect_fd, buffer, sizeof(buffer))) < 0)
-        {
-            perror("read error");
-            return 5;
-        }
-        printf("client %s:%d send\n%s\n", client_ip, client_port, buffer);
-
-        if (write(connect_fd, buffer, read_size + 1) < 0)
-        {
-            perror("write error");
-            return 6;
-        }
+        echo(connect_fd, &client_address);
     }
     close(listen_fd);
     return 0;
