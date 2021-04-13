@@ -1,0 +1,9 @@
+# text   : 使用 lf 换行符进行存储.
+# binary : 原样存储.
+
+# 自动识别文件是否为text
+*                text=auto eol=lf
+
+# 使用 lf 存储, checkout 时替换为 lf.
+*.c              text eol=lf
+*.md             text eol=lf
