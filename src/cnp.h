@@ -16,3 +16,5 @@
 int create_socket_ipv4_tcp();
 
 struct sockaddr_in create_sockaddr_ipv4_port(const char *ipv4, const char *port);
+
+char* format_ipv4_port(const struct sockaddr_in *addr);

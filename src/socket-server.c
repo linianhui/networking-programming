@@ -6,16 +6,15 @@ void echo(int connect_fd, struct sockaddr_in *client_address)
     char buffer[BUFFER_SIZE];
     bzero(buffer, sizeof(buffer));
 
-    char *client_ip = inet_ntoa(client_address->sin_addr);
-    in_port_t client_port = client_address->sin_port;
+    char *client_ip_port = format_ipv4_port(client_address);
 
-    printf("\nclient %s:%d connected\n", client_ip, client_port);
+    printf("\nclient %s connected\n", client_ip_port);
     printf("server pid=%d handler\n", pid);
 
     int read_size;
     while ((read_size = recv(connect_fd, buffer, sizeof(buffer), 0)) != 0)
     {
-        printf("client %s:%d send\n%s\n", client_ip, client_port, buffer);
+        printf("client %s send\n%s\n", client_ip_port, buffer);
         for (size_t i = 0; i < read_size; i++)
         {
             buffer[i] = toupper(buffer[i]);
@@ -52,7 +51,8 @@ int main()
     }
 
     pid_t pid = getpid();
-    printf("server srart pid=%d port=%s \nwaiting for client connect...\n", pid, SERVER_PORT);
+    char *server_ip_port = format_ipv4_port(&server_address);
+    printf("server srart pid=%d %s \nwaiting for client connect...\n", pid, server_ip_port);
 
     int connect_fd;
     struct sockaddr_in client_address;

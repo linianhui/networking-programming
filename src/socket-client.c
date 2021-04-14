@@ -9,9 +9,9 @@ int main(int argc, char *argv[])
     printf("client srart\n");
 
     connect(connect_fd, (struct sockaddr *)&server_address, sizeof(server_address));
-    char *server_ip = inet_ntoa(server_address.sin_addr);
-    in_port_t server_port = server_address.sin_port;
-    printf("connected to server %s:%d ...\n", server_ip, server_port);
+    char *server_ip_port = format_ipv4_port(&server_address);
+
+    printf("connected to server %s ...\n", server_ip_port);
 
     char read_buffer[BUFFER_SIZE];
     char write_buffer[BUFFER_SIZE];

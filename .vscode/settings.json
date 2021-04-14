@@ -2,6 +2,10 @@
     "files.associations": {
         "__locale": "c",
         "cctype": "c",
-        "locale": "c"
+        "locale": "c",
+        "cwchar": "c",
+        "string": "c",
+        "string_view": "c",
+        "utility": "c"
     }
 }
