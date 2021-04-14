@@ -12,3 +12,5 @@
 
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 128
+
+int create_socket_ipv4_tcp();

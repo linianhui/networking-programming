@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv)
 {
-    int connect_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int connect_fd = create_socket_ipv4_tcp();
 
     struct sockaddr_in server_address;
     bzero(&server_address, sizeof server_address);

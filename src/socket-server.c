@@ -31,7 +31,7 @@ void echo(int connect_fd, struct sockaddr_in *client_address)
 
 int main()
 {
-    int listen_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int listen_fd = create_socket_ipv4_tcp();
     if (listen_fd < 0)
     {
         perror("socket error");
