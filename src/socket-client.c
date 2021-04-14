@@ -1,14 +1,11 @@
 #include "cnp.h"
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     int connect_fd = create_socket_ipv4_tcp();
 
-    struct sockaddr_in server_address;
-    bzero(&server_address, sizeof server_address);
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(SERVER_PORT);
-    inet_pton(AF_INET, "127.0.0.1", &(server_address.sin_addr));
+    struct sockaddr_in server_address = create_sockaddr_ipv4_port("127.0.0.1", SERVER_PORT);
+
     printf("client srart\n");
 
     connect(connect_fd, (struct sockaddr *)&server_address, sizeof(server_address));

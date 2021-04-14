@@ -38,11 +38,7 @@ int main()
         return 1;
     }
 
-    struct sockaddr_in server_address;
-    bzero(&server_address, sizeof(server_address));
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = htons(INADDR_ANY);
-    server_address.sin_port = htons(SERVER_PORT);
+    struct sockaddr_in server_address = create_sockaddr_ipv4_port("0.0.0.0", SERVER_PORT);
     if (bind(listen_fd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         perror("bind error");
@@ -56,7 +52,7 @@ int main()
     }
 
     pid_t pid = getpid();
-    printf("server srart pid=%d port=%d \nwaiting for client connect...\n", pid, SERVER_PORT);
+    printf("server srart pid=%d port=%s \nwaiting for client connect...\n", pid, SERVER_PORT);
 
     int connect_fd;
     struct sockaddr_in client_address;
