@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     int connect_fd = create_socket_ipv4_tcp();
     printf("connect_fd %d\n", connect_fd);
 
-    struct sockaddr_in server_address = create_sockaddr_ipv4_port("127.0.0.1", SERVER_PORT);
+    struct sockaddr_in server_address = create_sockaddr_ipv4_port_from_args(argc, argv, "127.0.0.1");
 
     connect_e(connect_fd, (struct sockaddr *)&server_address, sizeof(server_address));
 

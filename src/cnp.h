@@ -19,6 +19,8 @@ int create_socket_ipv4_tcp();
 
 struct sockaddr_in create_sockaddr_ipv4_port(const char *ipv4, const char *port);
 
+struct sockaddr_in create_sockaddr_ipv4_port_from_args(int argc, char *argv[], char *default_ip);
+
 int socket_e(int domain, int type, int protocol);
 
 int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen);

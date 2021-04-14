@@ -24,6 +24,29 @@ struct sockaddr_in create_sockaddr_ipv4_port(const char *ipv4, const char *port)
     return addr;
 }
 
+struct sockaddr_in create_sockaddr_ipv4_port_from_args(int argc, char *argv[], char *default_ip)
+{
+    char *port = SERVER_PORT;
+    switch (argc)
+    {
+    case 2:
+    {
+        default_ip = argv[1];
+        break;
+    }
+    case 3:
+    {
+        default_ip = argv[1];
+        port = argv[2];
+        break;
+    }
+    default:
+        break;
+    }
+
+    return create_sockaddr_ipv4_port(default_ip, port);
+}
+
 int socket_e(int domain, int type, int protocol)
 {
     int sockfd = socket(domain, type, protocol);

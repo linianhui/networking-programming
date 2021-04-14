@@ -29,7 +29,7 @@ void echo(int connect_fd, struct sockaddr_in *client_address)
     close_e(connect_fd);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     pid_t pid = getpid();
     printf("server srart pid %d\n", pid);
@@ -37,7 +37,7 @@ int main()
     int listen_fd = create_socket_ipv4_tcp();
     printf("listen_fd %d\n", listen_fd);
 
-    struct sockaddr_in server_address = create_sockaddr_ipv4_port("0.0.0.0", SERVER_PORT);
+    struct sockaddr_in server_address = create_sockaddr_ipv4_port_from_args(argc, argv, "0.0.0.0");
     bind_e(listen_fd, (struct sockaddr *)&server_address, sizeof(server_address));
     listen_e(listen_fd, 10);
 
