@@ -46,13 +46,13 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
 
 int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen)
 {
-    int connectfd = accept(sockfd, cliaddr, addrlen);
-    if (connectfd == -1)
+    int connect_fd = accept(sockfd, cliaddr, addrlen);
+    if (connect_fd == -1)
     {
         perror("SOCKET accept ERROR");
         exit(5);
     }
-    return connectfd;
+    return connect_fd;
 }
 
 ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)

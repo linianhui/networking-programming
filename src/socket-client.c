@@ -3,9 +3,10 @@
 int main(int argc, char *argv[])
 {
     pid_t pid = getpid();
-    printf("client srart pid=%d\n", pid);
+    printf("client srart pid %d\n", pid);
 
     int connect_fd = create_socket_ipv4_tcp();
+    printf("connect_fd %d\n", connect_fd);
 
     struct sockaddr_in server_address = create_sockaddr_ipv4_port("127.0.0.1", SERVER_PORT);
 
