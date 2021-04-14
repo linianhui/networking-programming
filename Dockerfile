@@ -5,9 +5,7 @@ WORKDIR /build
 
 COPY . /build
 
-RUN gcc src/cnp.c src/socket-server.c -o bin/socket-server
-
-RUN gcc src/cnp.c src/socket-client.c -o bin/socket-client
+RUN make
 
 
 # https://hub.docker.com/_/debian
