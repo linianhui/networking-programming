@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     connect(connect_fd, (struct sockaddr *)&server_address, sizeof(server_address));
     char *server_ip = inet_ntoa(server_address.sin_addr);
     in_port_t server_port = server_address.sin_port;
-    printf("cconnected to server %s:%d ...\n", server_ip, server_port);
+    printf("connected to server %s:%d ...\n", server_ip, server_port);
 
     char read_buffer[BUFFER_SIZE];
     char write_buffer[BUFFER_SIZE];

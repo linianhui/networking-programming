@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define LISTEN_PORT 12345
 #define BUFFER_SIZE 128
@@ -26,9 +27,14 @@ void echo(int connect_fd, struct sockaddr_in *client_address)
     while ((read_size = recv(connect_fd, buffer, sizeof(buffer), 0)) != 0)
     {
         printf("client %s:%d send\n%s\n", client_ip, client_port, buffer);
+        for (size_t i = 0; i < read_size; i++)
+        {
+            buffer[i] = toupper(buffer[i]);
+        }
+
         if (send(connect_fd, buffer, read_size + 1, 0) > 0)
         {
-            printf("server pid=%d echo:\n%s\n", pid, buffer);
+            printf("server pid=%d echo toupper:\n%s\n", pid, buffer);
         }
     }
     printf("server pid=%d close connect\n", pid);
