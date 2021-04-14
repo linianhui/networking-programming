@@ -1,9 +1,9 @@
 # Run
 
 ```sh
-docker build -t socket-echo ./socket-echo
+docker build -t socket .
 
-docker run -t --name socket-echo-server socket-echo
+docker run -t --rm --name socket socket socket-server
 
-docker exec -it socket-echo-server ./client
+docker exec -it socket socket-client
 ```

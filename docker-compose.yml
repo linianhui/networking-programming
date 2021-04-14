@@ -1,14 +1,15 @@
 version: "3.3"
 
 services:
-    socket-echo.server:
-      build: ./socket-echo/
+    socket.server:
+      build: .
+      entrypoint: ["socket-server"]
       ports:
         - '12345:12345'
 
-    socket-echo.client:
-      build: ./socket-echo/
+    socket.client:
+      build: .
       depends_on:
-        - socket-echo.server
-      entrypoint: ["echo", "hello | ./client -"]
-      network_mode: "service:socket-echo.server"
+        - socket.server
+      entrypoint: ["echo", "hello | socket-client -"]
+      network_mode: "service:socket.server"
