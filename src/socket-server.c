@@ -1,15 +1,4 @@
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#define LISTEN_PORT 12345
-#define BUFFER_SIZE 128
+#include "cnp.h"
 
 void echo(int connect_fd, struct sockaddr_in *client_address)
 {
@@ -53,7 +42,7 @@ int main()
     bzero(&server_address, sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htons(INADDR_ANY);
-    server_address.sin_port = htons(LISTEN_PORT);
+    server_address.sin_port = htons(SERVER_PORT);
     if (bind(listen_fd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         perror("bind error");
@@ -67,7 +56,7 @@ int main()
     }
 
     pid_t pid = getpid();
-    printf("server srart pid=%d port=%d \nwaiting for client connect...\n", pid, LISTEN_PORT);
+    printf("server srart pid=%d port=%d \nwaiting for client connect...\n", pid, SERVER_PORT);
 
     int connect_fd;
     struct sockaddr_in client_address;
