@@ -2,12 +2,19 @@
 
 char *get_ip_port(const struct sockaddr *addr)
 {
-    struct sockaddr_in *addrin = (struct sockaddr_in *)&addr;
-    char *ip = inet_ntoa(addrin->sin_addr);
-    int port = htons(addrin->sin_port);
-    char *ip_port = (char *)malloc(strlen(ip) + 7);
-    sprintf(ip_port, "%s:%u", ip, port);
-    return ip_port;
+    socklen_t addrlen = sizeof(addr);
+    char hostbuf[NI_MAXHOST], ipbuf[NI_MAXSERV];
+    int result = getnameinfo(addr, addrlen,
+                             hostbuf, sizeof(hostbuf),
+                             ipbuf, sizeof(ipbuf),
+                             NI_NUMERICHOST | NI_NUMERICSERV);
+    if (result == 0)
+    {
+        char *ip_port = (char *)malloc(strlen(hostbuf) + 1 + strlen(ipbuf));
+        sprintf(ip_port, "%s:%s", hostbuf, ipbuf);
+        return ip_port;
+    }
+    return "unknown-ip:unknown-port";
 }
 
 int create_socket()
