@@ -9,9 +9,18 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <errno.h>
 
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
+
+#define printf_error(...) {                                             \
+    fprintf(stderr, __VA_ARGS__);                                       \
+    fprintf(stderr, " errno=%d errstr=%s\n", errno, strerror(errno));   \
+    fflush(stderr);                                                     \
+    fflush(stdout);                                                     \
+}
+
 
 char *get_ip_port(const struct sockaddr *addr);
 
