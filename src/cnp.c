@@ -2,9 +2,8 @@
 
 char *get_ip_port(const struct sockaddr *addr)
 {
-    socklen_t addrlen = sizeof(addr);
     char hostbuf[NI_MAXHOST], ipbuf[NI_MAXSERV];
-    int result = getnameinfo(addr, addrlen,
+    int result = getnameinfo(addr, 16,
                              hostbuf, sizeof(hostbuf),
                              ipbuf, sizeof(ipbuf),
                              NI_NUMERICHOST | NI_NUMERICSERV);
