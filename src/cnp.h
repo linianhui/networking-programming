@@ -15,8 +15,9 @@
 #define BUFFER_SIZE 128
 
 #define printf_error(...) {                                             \
+    int temp = errno;                                                   \
     fprintf(stderr, __VA_ARGS__);                                       \
-    fprintf(stderr, " errno=%d errstr=%s\n", errno, strerror(errno));   \
+    fprintf(stderr, " errno=%d errstr=%s\n", temp, strerror(temp));     \
     fflush(stderr);                                                     \
     fflush(stdout);                                                     \
 }
