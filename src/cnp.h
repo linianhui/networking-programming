@@ -13,29 +13,26 @@
 
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
+#define IP_STRING_SIZE 16
+#define PORT_STRING_SIZE 6
+#define IP_PORT_STRING_SIZE 32
+#define PROMPT_SIZE 64
 
 typedef struct sockaddr sa;
 
+#define printf_error(...)                                           \
+  {                                                                 \
+    int temp = errno;                                               \
+    fprintf(stderr, __VA_ARGS__);                                   \
+    fprintf(stderr, " errno=%d errstr=%s\n", temp, strerror(temp)); \
+    fflush(stderr);                                                 \
+  }
 
-#define printf_error(...) {                                             \
-    int temp = errno;                                                   \
-    fprintf(stderr, __VA_ARGS__);                                       \
-    fprintf(stderr, " errno=%d errstr=%s\n", temp, strerror(temp));     \
-    fflush(stderr);                                                     \
-}
-
-#define printf_flush(...) {                                             \
-    fprintf(stdout, __VA_ARGS__);                                       \
-    fflush(stdout);                                                     \
-}
-
-in_addr_t hostname_to_ip(const char *hostname);
-
-char *get_ip_port(const struct sockaddr *addr);
-
-char *get_sock_ip_port(int sockfd);
-
-char *get_peer_ip_port(int sockfd);
+#define printf_flush(...)         \
+  {                               \
+    fprintf(stdout, __VA_ARGS__); \
+    fflush(stdout);               \
+  }
 
 int create_socket();
 
@@ -63,6 +60,14 @@ int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
-char *get_local_prompt(int sockfd);
+in_addr_t hostname_to_ip(const char *hostname);
 
-char *get_remote_prompt(int sockfd);
+int get_ip_port(const struct sockaddr *addr, char *ip_port);
+
+int get_local_ip_port(int sockfd, char *ip_port);
+
+int get_remote_ip_port(int sockfd, char *ip_port);
+
+int get_local_prompt(int sockfd, char *prompt);
+
+int get_remote_prompt(int sockfd, char *prompt);

@@ -1,52 +1,5 @@
 #include "cnp.h"
 
-in_addr_t hostname_to_ip(const char *hostname)
-{
-    struct hostent *hostent = gethostbyname(hostname);
-    if (hostent == NULL)
-    {
-        return -1;
-    }
-
-    if (hostent->h_length < 1)
-    {
-        return -1;
-    }
-
-    struct in_addr *addr = (struct in_addr *)(hostent->h_addr_list[0]);
-    in_addr_t ip = addr->s_addr;
-    freehostent(hostent);
-    return ip;
-}
-
-char *get_ip_port(const struct sockaddr *addr)
-{
-    char hostbuf[NI_MAXHOST], ipbuf[NI_MAXSERV];
-    int result = getnameinfo(addr, 16,
-                             hostbuf, sizeof(hostbuf),
-                             ipbuf, sizeof(ipbuf),
-                             NI_NUMERICHOST | NI_NUMERICSERV);
-    char *ip_port = (char *)malloc(22);
-    sprintf(ip_port, "%s:%s", hostbuf, ipbuf);
-    return ip_port;
-}
-
-char *get_sock_ip_port(int sockfd)
-{
-    struct sockaddr_in addr;
-    socklen_t len = sizeof(addr);
-    getsockname_e(sockfd, (sa *)&addr, &len);
-    return get_ip_port((sa *)&addr);
-}
-
-char *get_peer_ip_port(int sockfd)
-{
-    struct sockaddr_in addr;
-    socklen_t len = sizeof(addr);
-    getpeername_e(sockfd, (sa *)&addr, &len);
-    return get_ip_port((sa *)&addr);
-}
-
 int create_socket()
 {
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -99,7 +52,9 @@ int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     int result = bind(sockfd, addr, addrlen);
     if (result == -1)
     {
-        printf_error("SOCKET ERROR : bind %s", get_ip_port(addr));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_ip_port(addr, ip_port);
+        printf_error("SOCKET ERROR : bind %s", ip_port);
         exit(2);
     }
     return result;
@@ -110,7 +65,9 @@ int listen_e(int sockfd, int backlog)
     int result = listen(sockfd, backlog);
     if (result == -1)
     {
-        printf_error("SOCKET ERROR : listen %s", get_sock_ip_port(sockfd));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_local_ip_port(sockfd, ip_port);
+        printf_error("SOCKET ERROR : listen %s", ip_port);
         exit(3);
     }
     return result;
@@ -121,7 +78,9 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
     int result = connect(sockfd, servaddr, addrlen);
     if (result == -1)
     {
-        printf_error("SOCKET ERROR : connect %s", get_ip_port(servaddr));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_ip_port(servaddr, ip_port);
+        printf_error("SOCKET ERROR : connect %s", ip_port);
         exit(4);
     }
     return result;
@@ -132,7 +91,9 @@ int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen)
     int connect_fd = accept(sockfd, cliaddr, addrlen);
     if (connect_fd == -1)
     {
-        printf_error("SOCKET ERROR : accept %s", get_ip_port(cliaddr));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_ip_port(cliaddr, ip_port);
+        printf_error("SOCKET ERROR : accept %s", ip_port);
         exit(5);
     }
     return connect_fd;
@@ -143,7 +104,9 @@ ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)
     ssize_t size = send(sockfd, buf, len, flags);
     if (size == -1)
     {
-        printf_error("SOCKET ERROR : send to %s", get_peer_ip_port(sockfd));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_remote_ip_port(sockfd, ip_port);
+        printf_error("SOCKET ERROR : send to %s", ip_port);
         exit(6);
     }
     return size;
@@ -154,7 +117,9 @@ ssize_t recv_e(int sockfd, void *buf, size_t len, int flags)
     ssize_t size = recv(sockfd, buf, len, flags);
     if (size == -1)
     {
-        printf_error("SOCKET ERROR : recv from %s", get_peer_ip_port(sockfd));
+        char ip_port[IP_PORT_STRING_SIZE];
+        get_remote_ip_port(sockfd, ip_port);
+        printf_error("SOCKET ERROR : recv from %s", ip_port);
         exit(7);
     }
     return size;
@@ -193,18 +158,65 @@ int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     return result;
 }
 
-char *get_local_prompt(int sockfd)
+in_addr_t hostname_to_ip(const char *hostname)
 {
-    char *ip_port = get_sock_ip_port(sockfd);
-    char *prompt = (char *)malloc(64);
-    sprintf(prompt, "[local  %s]>", ip_port);
-    return prompt;
+    struct hostent *hostent = gethostbyname(hostname);
+    if (hostent == NULL)
+    {
+        return -1;
+    }
+
+    if (hostent->h_length < 1)
+    {
+        return -1;
+    }
+
+    struct in_addr *addr = (struct in_addr *)(hostent->h_addr_list[0]);
+    in_addr_t ip = addr->s_addr;
+    freehostent(hostent);
+    return ip;
 }
 
-char *get_remote_prompt(int sockfd)
+int get_ip_port(const struct sockaddr *addr, char *ip_port)
 {
-    char *ip_port = get_peer_ip_port(sockfd);
-    char *prompt = (char *)malloc(64);
+    char ip[IP_STRING_SIZE];
+    char port[PORT_STRING_SIZE];
+    int result = getnameinfo(addr, 16,
+                             ip, sizeof(ip),
+                             port, sizeof(port),
+                             NI_NUMERICHOST | NI_NUMERICSERV);
+    sprintf(ip_port, "%s:%s", ip, port);
+    return 0;
+}
+
+int get_local_ip_port(int sockfd, char *ip_port)
+{
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    getsockname_e(sockfd, (sa *)&addr, &len);
+    return get_ip_port((sa *)&addr, ip_port);
+}
+
+int get_remote_ip_port(int sockfd, char *ip_port)
+{
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    getpeername_e(sockfd, (sa *)&addr, &len);
+    return get_ip_port((sa *)&addr, ip_port);
+}
+
+int get_local_prompt(int sockfd, char *prompt)
+{
+    char ip_port[IP_PORT_STRING_SIZE];
+    get_local_ip_port(sockfd, ip_port);
+    sprintf(prompt, "[local  %s]>", ip_port);
+    return 0;
+}
+
+int get_remote_prompt(int sockfd, char *prompt)
+{
+    char ip_port[IP_PORT_STRING_SIZE];
+    get_remote_ip_port(sockfd, ip_port);
     sprintf(prompt, "[remote %s]>", ip_port);
-    return prompt;
+    return 0;
 }

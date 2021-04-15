@@ -6,15 +6,23 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
 
-    char *client_ip_port = get_ip_port(cliaddr);
+    char client_ip_port[IP_PORT_STRING_SIZE];
+    get_ip_port(cliaddr, client_ip_port);
 
     printf_flush("\nclient %s connected\n", client_ip_port);
     printf_flush("server pid %d connect_fd %d handler\n", pid, connect_fd);
 
     int recv_size;
+    char local_prompt[PROMPT_SIZE];
+    char remote_prompt[PROMPT_SIZE];
     while ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
     {
-        printf_flush("%s %s", get_remote_prompt(connect_fd), buf);
+        bzero(local_prompt, sizeof(local_prompt));
+        bzero(remote_prompt, sizeof(remote_prompt));
+
+        get_remote_prompt(connect_fd, remote_prompt);
+        printf_flush("%s %s", remote_prompt, buf);
+
         for (size_t i = 0; i < recv_size; i++)
         {
             buf[i] = toupper(buf[i]);
@@ -22,7 +30,8 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
 
         if (send_e(connect_fd, buf, recv_size + 1, 0) > 0)
         {
-            printf_flush("%s %s", get_local_prompt(connect_fd), buf);
+            get_local_prompt(connect_fd, remote_prompt);
+            printf_flush("%s %s", remote_prompt, buf);
         }
     }
     printf_flush("server pid %d connect_fd %d close connect\n", pid, connect_fd);
@@ -43,7 +52,8 @@ int main(int argc, char *argv[])
     bind_e(listen_fd, (sa *)&servaddr, sizeof(servaddr));
     listen_e(listen_fd, 10);
 
-    char *server_ip_port = get_ip_port((sa *)&servaddr);
+    char server_ip_port[IP_PORT_STRING_SIZE];
+    get_ip_port((sa *)&servaddr, server_ip_port);
     printf_flush("listen on %s \nwaiting for client connect...\n", server_ip_port);
 
     int connect_fd;
