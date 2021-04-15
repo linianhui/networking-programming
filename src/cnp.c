@@ -173,7 +173,6 @@ in_addr_t hostname_to_ip(const char *hostname)
 
     struct in_addr *addr = (struct in_addr *)(hostent->h_addr_list[0]);
     in_addr_t ip = addr->s_addr;
-    freehostent(hostent);
     return ip;
 }
 
