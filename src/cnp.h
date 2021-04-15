@@ -24,6 +24,10 @@
 
 char *get_ip_port(const struct sockaddr *addr);
 
+char * get_sock_ip_port(int sockfd);
+
+char * get_peer_ip_port(int sockfd);
+
 int create_socket();
 
 struct sockaddr create_sockaddr(const char *ipv4, const char *port);
@@ -45,3 +49,7 @@ ssize_t send_e(int sockfd, const void *buf, size_t len, int flags);
 ssize_t recv_e(int sockfd, void *buf, size_t len, int flags);
 
 int close_e(int fd);
+
+int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);

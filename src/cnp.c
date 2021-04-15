@@ -16,6 +16,22 @@ char *get_ip_port(const struct sockaddr *addr)
     return "unknown-ip:unknown-port";
 }
 
+char *get_sock_ip_port(int sockfd)
+{
+    struct sockaddr addr;
+    socklen_t len;
+    getsockname_e(sockfd, &addr, &len);
+    return get_ip_port(&addr);
+}
+
+char *get_peer_ip_port(int sockfd)
+{
+    struct sockaddr addr;
+    socklen_t len;
+    getpeername_e(sockfd, &addr, &len);
+    return get_ip_port(&addr);
+}
+
 int create_socket()
 {
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -82,7 +98,7 @@ int listen_e(int sockfd, int backlog)
     int result = listen(sockfd, backlog);
     if (result == -1)
     {
-        printf_error("SOCKET ERROR : listen");
+        printf_error("SOCKET ERROR : listen %s", get_sock_ip_port(sockfd));
         exit(3);
     }
     return result;
@@ -115,7 +131,7 @@ ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)
     ssize_t size = send(sockfd, buf, len, flags);
     if (size == -1)
     {
-        printf_error("SOCKET ERROR : send");
+        printf_error("SOCKET ERROR : send to %s", get_peer_ip_port(sockfd));
         exit(6);
     }
     return size;
@@ -126,7 +142,7 @@ ssize_t recv_e(int sockfd, void *buf, size_t len, int flags)
     ssize_t size = recv(sockfd, buf, len, flags);
     if (size == -1)
     {
-        printf_error("SOCKET ERROR : recv");
+        printf_error("SOCKET ERROR : recv from %s", get_peer_ip_port(sockfd));
         exit(7);
     }
     return size;
@@ -139,6 +155,28 @@ int close_e(int fd)
     {
         printf_error("SOCKET ERROR : close");
         exit(8);
+    }
+    return result;
+}
+
+int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+    int result = getsockname(sockfd, addr, addrlen);
+    if (result == -1)
+    {
+        printf_error("SOCKET ERROR : getsockname");
+        exit(9);
+    }
+    return result;
+}
+
+int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+    int result = getpeername(sockfd, addr, addrlen);
+    if (result == -1)
+    {
+        printf_error("SOCKET ERROR : getpeername");
+        exit(10);
     }
     return result;
 }
