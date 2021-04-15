@@ -5,14 +5,14 @@ int main(int argc, char *argv[])
     pid_t pid = getpid();
     printf("client srart pid %d\n", pid);
 
-    int connect_fd = create_socket_ipv4_tcp();
+    int connect_fd = create_socket();
     printf("connect_fd %d\n", connect_fd);
 
-    struct sockaddr servaddr = create_sockaddr_ipv4_port_from_args(argc, argv, "127.0.0.1");
+    struct sockaddr servaddr = create_sockaddr_from_args(argc, argv, "127.0.0.1");
 
     connect_e(connect_fd, &servaddr, sizeof(servaddr));
 
-    char *server_ip_port = format_ipv4_port(&servaddr);
+    char *server_ip_port = get_ip_port(&servaddr);
     printf("connected to server %s\n", server_ip_port);
 
     char recv_buf[BUFFER_SIZE];

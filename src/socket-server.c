@@ -6,7 +6,7 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
 
-    char *client_ip_port = format_ipv4_port(cliaddr);
+    char *client_ip_port = get_ip_port(cliaddr);
 
     printf("\nclient %s connected\n", client_ip_port);
     printf("server pid %d connect_fd %d handler\n", pid, connect_fd);
@@ -34,14 +34,14 @@ int main(int argc, char *argv[])
     pid_t pid = getpid();
     printf("server srart pid %d\n", pid);
 
-    int listen_fd = create_socket_ipv4_tcp();
+    int listen_fd = create_socket();
     printf("listen_fd %d\n", listen_fd);
 
-    struct sockaddr servaddr = create_sockaddr_ipv4_port_from_args(argc, argv, "0.0.0.0");
+    struct sockaddr servaddr = create_sockaddr_from_args(argc, argv, "0.0.0.0");
     bind_e(listen_fd, &servaddr, sizeof(servaddr));
     listen_e(listen_fd, 10);
 
-    char *server_ip_port = format_ipv4_port(&servaddr);
+    char *server_ip_port = get_ip_port(&servaddr);
     printf("listen on %s \nwaiting for client connect...\n", server_ip_port);
 
     int connect_fd;

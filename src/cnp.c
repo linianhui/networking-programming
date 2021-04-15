@@ -1,6 +1,6 @@
 #include "cnp.h"
 
-char *format_ipv4_port(const struct sockaddr *addr)
+char *get_ip_port(const struct sockaddr *addr)
 {
     struct sockaddr_in *addrin = (struct sockaddr_in *)&addr;
     char *ip = inet_ntoa(addrin->sin_addr);
@@ -10,12 +10,12 @@ char *format_ipv4_port(const struct sockaddr *addr)
     return ip_port;
 }
 
-int create_socket_ipv4_tcp()
+int create_socket()
 {
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-struct sockaddr create_sockaddr_ipv4_port(const char *ipv4, const char *port)
+struct sockaddr create_sockaddr(const char *ipv4, const char *port)
 {
     struct sockaddr addr;
     bzero(&addr, sizeof addr);
@@ -26,7 +26,7 @@ struct sockaddr create_sockaddr_ipv4_port(const char *ipv4, const char *port)
     return addr;
 }
 
-struct sockaddr create_sockaddr_ipv4_port_from_args(int argc, char *argv[], char *default_ip)
+struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip)
 {
     char *port = SERVER_PORT;
     switch (argc)
@@ -46,7 +46,7 @@ struct sockaddr create_sockaddr_ipv4_port_from_args(int argc, char *argv[], char
         break;
     }
 
-    return create_sockaddr_ipv4_port(default_ip, port);
+    return create_sockaddr(default_ip, port);
 }
 
 int socket_e(int domain, int type, int protocol)

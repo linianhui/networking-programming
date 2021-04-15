@@ -13,13 +13,13 @@
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
 
-char *format_ipv4_port(const struct sockaddr *addr);
+char *get_ip_port(const struct sockaddr *addr);
 
-int create_socket_ipv4_tcp();
+int create_socket();
 
-struct sockaddr create_sockaddr_ipv4_port(const char *ipv4, const char *port);
+struct sockaddr create_sockaddr(const char *ipv4, const char *port);
 
-struct sockaddr create_sockaddr_ipv4_port_from_args(int argc, char *argv[], char *default_ip);
+struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip);
 
 int socket_e(int domain, int type, int protocol);
 
