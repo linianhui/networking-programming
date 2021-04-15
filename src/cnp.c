@@ -198,3 +198,19 @@ int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     }
     return result;
 }
+
+char *get_local_prompt(int sockfd)
+{
+    char *ip_port = get_sock_ip_port(sockfd);
+    char *prompt = (char *)malloc(64);
+    sprintf(prompt, "[local  %s]>", ip_port);
+    return prompt;
+}
+
+char *get_remote_prompt(int sockfd)
+{
+    char *ip_port = get_peer_ip_port(sockfd);
+    char *prompt = (char *)malloc(64);
+    sprintf(prompt, "[remote %s]>", ip_port);
+    return prompt;
+}

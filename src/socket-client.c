@@ -19,12 +19,13 @@ int main(int argc, char *argv[])
     char send_buf[BUFFER_SIZE];
     while (1)
     {
+        printf_flush("%s ", get_local_prompt(connect_fd));
         bzero(recv_buf, BUFFER_SIZE);
         bzero(send_buf, BUFFER_SIZE);
         fgets(send_buf, BUFFER_SIZE, stdin);
         send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
         recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
-        printf_flush("server echo:\n%s\n", recv_buf);
+        printf_flush("%s %s", get_remote_prompt(connect_fd), recv_buf);
     }
     close_e(connect_fd);
 }

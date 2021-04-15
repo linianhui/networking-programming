@@ -30,9 +30,9 @@ char *hostname_to_ip(const char *hostname);
 
 char *get_ip_port(const struct sockaddr *addr);
 
-char * get_sock_ip_port(int sockfd);
+char *get_sock_ip_port(int sockfd);
 
-char * get_peer_ip_port(int sockfd);
+char *get_peer_ip_port(int sockfd);
 
 int create_socket();
 
@@ -59,3 +59,7 @@ int close_e(int fd);
 int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+char *get_local_prompt(int sockfd);
+
+char *get_remote_prompt(int sockfd);

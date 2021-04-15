@@ -14,7 +14,7 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
     int recv_size;
     while ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
     {
-        printf_flush("client %s send\n%s\n", client_ip_port, buf);
+        printf_flush("%s %s", get_remote_prompt(connect_fd), buf);
         for (size_t i = 0; i < recv_size; i++)
         {
             buf[i] = toupper(buf[i]);
@@ -22,7 +22,7 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
 
         if (send_e(connect_fd, buf, recv_size + 1, 0) > 0)
         {
-            printf_flush("server pid %d connect_fd %d echo toupper:\n%s\n", pid, connect_fd, buf);
+            printf_flush("%s %s", get_local_prompt(connect_fd), buf);
         }
     }
     printf_flush("server pid %d connect_fd %d close connect\n", pid, connect_fd);
