@@ -19,6 +19,10 @@
     fprintf(stderr, __VA_ARGS__);                                       \
     fprintf(stderr, " errno=%d errstr=%s\n", temp, strerror(temp));     \
     fflush(stderr);                                                     \
+}
+
+#define printf_flush(...) {                                             \
+    fprintf(stdout, __VA_ARGS__);                                       \
     fflush(stdout);                                                     \
 }
 
