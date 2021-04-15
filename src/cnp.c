@@ -31,18 +31,18 @@ char *get_ip_port(const struct sockaddr *addr)
 
 char *get_sock_ip_port(int sockfd)
 {
-    struct sockaddr addr;
-    socklen_t len;
-    getsockname_e(sockfd, &addr, &len);
-    return get_ip_port(&addr);
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    getsockname_e(sockfd, (sa *)&addr, &len);
+    return get_ip_port((sa *)&addr);
 }
 
 char *get_peer_ip_port(int sockfd)
 {
-    struct sockaddr addr;
-    socklen_t len;
-    getpeername_e(sockfd, &addr, &len);
-    return get_ip_port(&addr);
+    struct sockaddr_in addr;
+    socklen_t len = sizeof(addr);
+    getpeername_e(sockfd, (sa *)&addr, &len);
+    return get_ip_port((sa *)&addr);
 }
 
 int create_socket()
