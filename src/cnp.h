@@ -22,6 +22,7 @@
     fflush(stdout);                                                     \
 }
 
+char *hostname_to_ip(const char *hostname);
 
 char *get_ip_port(const struct sockaddr *addr);
 
@@ -33,7 +34,7 @@ int create_socket();
 
 struct sockaddr create_sockaddr(const char *ipv4, const char *port);
 
-struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip);
+struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip_or_hostname);
 
 int socket_e(int domain, int type, int protocol);
 

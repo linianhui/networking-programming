@@ -1,5 +1,22 @@
 #include "cnp.h"
 
+char *hostname_to_ip(const char *hostname)
+{
+    struct hostent *hostent = gethostbyname(hostname);
+    if (hostent == NULL)
+    {
+        return NULL;
+    }
+
+    if (hostent->h_length < 1)
+    {
+        return NULL;
+    }
+
+    struct in_addr *ip = (struct in_addr *)(hostent->h_addr_list[0]);
+    return inet_ntoa(*ip);
+}
+
 char *get_ip_port(const struct sockaddr *addr)
 {
     char hostbuf[NI_MAXHOST], ipbuf[NI_MAXSERV];
@@ -37,8 +54,9 @@ int create_socket()
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-struct sockaddr create_sockaddr(const char *ipv4, const char *port)
+struct sockaddr create_sockaddr(const char *ip_or_hostname, const char *port)
 {
+    char *ipv4 = hostname_to_ip(ip_or_hostname);
     struct sockaddr addr;
     bzero(&addr, sizeof addr);
     struct sockaddr_in *addrin = (struct sockaddr_in *)&addr;
@@ -48,19 +66,19 @@ struct sockaddr create_sockaddr(const char *ipv4, const char *port)
     return addr;
 }
 
-struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip)
+struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip_or_hostname)
 {
     char *port = SERVER_PORT;
     switch (argc)
     {
     case 2:
     {
-        default_ip = argv[1];
+        default_ip_or_hostname = argv[1];
         break;
     }
     case 3:
     {
-        default_ip = argv[1];
+        default_ip_or_hostname = argv[1];
         port = argv[2];
         break;
     }
@@ -68,7 +86,7 @@ struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_
         break;
     }
 
-    return create_sockaddr(default_ip, port);
+    return create_sockaddr(default_ip_or_hostname, port);
 }
 
 int socket_e(int domain, int type, int protocol)

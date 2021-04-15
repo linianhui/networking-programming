@@ -19,8 +19,8 @@ make
 docker build -t socket .
 
 # 启动server
-docker run -t --rm --name socket socket socket-server
+docker run -t --rm --name socket-server socket socket-server
 
 # 启动client
-docker exec -it socket socket-client
+docker run -t --rm --name socket-client socket socket-client $(docker inspect -f "{{.NetworkSettings.IPAddress}}" socket-server)
 ```
