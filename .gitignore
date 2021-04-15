@@ -54,4 +54,3 @@ dkms.conf
 .DS_Store
 
 /bin
-!/bin/.gitkeep
