@@ -34,6 +34,10 @@ typedef struct sockaddr sa;
     fflush(stdout);               \
   }
 
+void register_signal();
+
+void signal_handler(int signo);
+
 int create_socket();
 
 void init_sockaddr(struct sockaddr_in *addr, const char *ipv4_or_hostname, const char *port);

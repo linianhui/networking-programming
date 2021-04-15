@@ -2,6 +2,8 @@
 
 int main(int argc, char *argv[])
 {
+    register_signal();
+
     pid_t pid = getpid();
     printf_flush("client srart pid %d\n", pid);
 

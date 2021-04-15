@@ -1,5 +1,20 @@
 #include "cnp.h"
 
+void register_signal()
+{
+    // signal(SIGHUP, signal_handler);
+    // signal(SIGINT, signal_handler);
+    // signal(SIGQUIT, signal_handler);
+    // signal(SIGKILL, signal_handler);
+    // signal(SIGTERM, signal_handler);
+    // signal(SIGCHLD, signal_handler);
+}
+
+void signal_handler(int signo)
+{
+    printf_flush("\n[signal] %d %s", signo, strsignal(signo));
+}
+
 int create_socket()
 {
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);

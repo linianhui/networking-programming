@@ -40,6 +40,8 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
 
 int main(int argc, char *argv[])
 {
+    register_signal();
+
     pid_t pid = getpid();
     printf_flush("server srart pid %d\n", pid);
 
