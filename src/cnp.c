@@ -24,13 +24,9 @@ char *get_ip_port(const struct sockaddr *addr)
                              hostbuf, sizeof(hostbuf),
                              ipbuf, sizeof(ipbuf),
                              NI_NUMERICHOST | NI_NUMERICSERV);
-    if (result == 0)
-    {
-        char *ip_port = (char *)malloc(strlen(hostbuf) + 1 + strlen(ipbuf));
-        sprintf(ip_port, "%s:%s", hostbuf, ipbuf);
-        return ip_port;
-    }
-    return "unknown-ip:unknown-port";
+    char *ip_port = (char *)malloc(22);
+    sprintf(ip_port, "%s:%s", hostbuf, ipbuf);
+    return ip_port;
 }
 
 char *get_sock_ip_port(int sockfd)
