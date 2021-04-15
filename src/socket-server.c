@@ -1,28 +1,28 @@
 #include "cnp.h"
 
-void echo(int connect_fd, struct sockaddr_in *client_address)
+void echo(int connect_fd, struct sockaddr *cliaddr)
 {
     pid_t pid = getpid();
-    char buffer[BUFFER_SIZE];
-    bzero(buffer, sizeof(buffer));
+    char buf[BUFFER_SIZE];
+    bzero(buf, sizeof(buf));
 
-    char *client_ip_port = format_ipv4_port(client_address);
+    char *client_ip_port = format_ipv4_port(cliaddr);
 
     printf("\nclient %s connected\n", client_ip_port);
     printf("server pid %d connect_fd %d handler\n", pid, connect_fd);
 
-    int read_size;
-    while ((read_size = recv_e(connect_fd, buffer, sizeof(buffer), 0)) != 0)
+    int recv_size;
+    while ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
     {
-        printf("client %s send\n%s\n", client_ip_port, buffer);
-        for (size_t i = 0; i < read_size; i++)
+        printf("client %s send\n%s\n", client_ip_port, buf);
+        for (size_t i = 0; i < recv_size; i++)
         {
-            buffer[i] = toupper(buffer[i]);
+            buf[i] = toupper(buf[i]);
         }
 
-        if (send_e(connect_fd, buffer, read_size + 1, 0) > 0)
+        if (send_e(connect_fd, buf, recv_size + 1, 0) > 0)
         {
-            printf("server pid %d connect_fd %d echo toupper:\n%s\n", pid, connect_fd, buffer);
+            printf("server pid %d connect_fd %d echo toupper:\n%s\n", pid, connect_fd, buf);
         }
     }
     printf("server pid %d connect_fd %d close connect\n", pid, connect_fd);
@@ -37,23 +37,23 @@ int main(int argc, char *argv[])
     int listen_fd = create_socket_ipv4_tcp();
     printf("listen_fd %d\n", listen_fd);
 
-    struct sockaddr_in server_address = create_sockaddr_ipv4_port_from_args(argc, argv, "0.0.0.0");
-    bind_e(listen_fd, (struct sockaddr *)&server_address, sizeof(server_address));
+    struct sockaddr servaddr = create_sockaddr_ipv4_port_from_args(argc, argv, "0.0.0.0");
+    bind_e(listen_fd, &servaddr, sizeof(servaddr));
     listen_e(listen_fd, 10);
 
-    char *server_ip_port = format_ipv4_port(&server_address);
+    char *server_ip_port = format_ipv4_port(&servaddr);
     printf("listen on %s \nwaiting for client connect...\n", server_ip_port);
 
     int connect_fd;
-    struct sockaddr_in client_address;
-    socklen_t client_length = sizeof(client_address);
+    struct sockaddr cliaddr;
+    socklen_t addrlen = sizeof(cliaddr);
 
     while (1)
     {
-        connect_fd = accept_e(listen_fd, (struct sockaddr *)&client_address, &client_length);
+        connect_fd = accept_e(listen_fd, &cliaddr, &addrlen);
         if (fork() == 0)
         {
-            echo(connect_fd, &client_address);
+            echo(connect_fd, &cliaddr);
             exit(0);
         }
         close_e(connect_fd);
