@@ -14,6 +14,9 @@
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
 
+typedef struct sockaddr sa;
+
+
 #define printf_error(...) {                                             \
     int temp = errno;                                                   \
     fprintf(stderr, __VA_ARGS__);                                       \
@@ -36,9 +39,9 @@ char *get_peer_ip_port(int sockfd);
 
 int create_socket();
 
-struct sockaddr create_sockaddr(const char *ipv4, const char *port);
+void init_sockaddr(struct sockaddr_in *addr, const char *ipv4_or_hostname, const char *port);
 
-struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip_or_hostname);
+void init_sockaddr_from_args(struct sockaddr_in *addr, int argc, char *argv[], char *default_ipv4_or_hostname);
 
 int socket_e(int domain, int type, int protocol);
 

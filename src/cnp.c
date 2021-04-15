@@ -50,31 +50,28 @@ int create_socket()
     return socket_e(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-struct sockaddr create_sockaddr(const char *ip_or_hostname, const char *port)
+void init_sockaddr(struct sockaddr_in *addr, const char *ipv4_or_hostname, const char *port)
 {
-    char *ipv4 = hostname_to_ip(ip_or_hostname);
-    struct sockaddr addr;
-    bzero(&addr, sizeof addr);
-    struct sockaddr_in *addrin = (struct sockaddr_in *)&addr;
-    addrin->sin_family = AF_INET;
-    addrin->sin_addr.s_addr = inet_addr(ipv4);
-    addrin->sin_port = htons(atoi(port));
-    return addr;
+    char *ipv4 = hostname_to_ip(ipv4_or_hostname);
+    bzero(addr, sizeof(&addr));
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = inet_addr(ipv4);
+    addr->sin_port = htons(atoi(port));
 }
 
-struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_ip_or_hostname)
+void init_sockaddr_from_args(struct sockaddr_in *addr, int argc, char *argv[], char *default_ipv4_or_hostname)
 {
     char *port = SERVER_PORT;
     switch (argc)
     {
     case 2:
     {
-        default_ip_or_hostname = argv[1];
+        default_ipv4_or_hostname = argv[1];
         break;
     }
     case 3:
     {
-        default_ip_or_hostname = argv[1];
+        default_ipv4_or_hostname = argv[1];
         port = argv[2];
         break;
     }
@@ -82,7 +79,7 @@ struct sockaddr create_sockaddr_from_args(int argc, char *argv[], char *default_
         break;
     }
 
-    return create_sockaddr(default_ip_or_hostname, port);
+    init_sockaddr(addr, default_ipv4_or_hostname, port);
 }
 
 int socket_e(int domain, int type, int protocol)

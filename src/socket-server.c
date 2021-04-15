@@ -37,11 +37,13 @@ int main(int argc, char *argv[])
     int listen_fd = create_socket();
     printf_flush("listen_fd %d\n", listen_fd);
 
-    struct sockaddr servaddr = create_sockaddr_from_args(argc, argv, "0.0.0.0");
-    bind_e(listen_fd, &servaddr, sizeof(servaddr));
+    struct sockaddr_in servaddr;
+    init_sockaddr_from_args(&servaddr, argc, argv, "0.0.0.0");
+
+    bind_e(listen_fd, (sa *)&servaddr, sizeof(servaddr));
     listen_e(listen_fd, 10);
 
-    char *server_ip_port = get_ip_port(&servaddr);
+    char *server_ip_port = get_ip_port((sa *)&servaddr);
     printf_flush("listen on %s \nwaiting for client connect...\n", server_ip_port);
 
     int connect_fd;
