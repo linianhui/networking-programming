@@ -1,20 +1,22 @@
 #include "cnp.h"
 
-char *hostname_to_ip(const char *hostname)
+in_addr_t hostname_to_ip(const char *hostname)
 {
     struct hostent *hostent = gethostbyname(hostname);
     if (hostent == NULL)
     {
-        return NULL;
+        return -1;
     }
 
     if (hostent->h_length < 1)
     {
-        return NULL;
+        return -1;
     }
 
-    struct in_addr *ip = (struct in_addr *)(hostent->h_addr_list[0]);
-    return inet_ntoa(*ip);
+    struct in_addr *addr = (struct in_addr *)(hostent->h_addr_list[0]);
+    in_addr_t ip = addr->s_addr;
+    freehostent(hostent);
+    return ip;
 }
 
 char *get_ip_port(const struct sockaddr *addr)
@@ -52,10 +54,9 @@ int create_socket()
 
 void init_sockaddr(struct sockaddr_in *addr, const char *ipv4_or_hostname, const char *port)
 {
-    char *ipv4 = hostname_to_ip(ipv4_or_hostname);
     bzero(addr, sizeof(&addr));
     addr->sin_family = AF_INET;
-    addr->sin_addr.s_addr = inet_addr(ipv4);
+    addr->sin_addr.s_addr = hostname_to_ip(ipv4_or_hostname);
     addr->sin_port = htons(atoi(port));
 }
 

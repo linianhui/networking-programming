@@ -29,7 +29,7 @@ typedef struct sockaddr sa;
     fflush(stdout);                                                     \
 }
 
-char *hostname_to_ip(const char *hostname);
+in_addr_t hostname_to_ip(const char *hostname);
 
 char *get_ip_port(const struct sockaddr *addr);
 
