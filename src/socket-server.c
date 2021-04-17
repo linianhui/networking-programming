@@ -40,24 +40,7 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
 
 int main(int argc, char *argv[])
 {
-    register_signal();
-
-    pid_t pid = getpid();
-    printf_flush("server srart pid %d\n", pid);
-
-    int listen_fd = create_socket();
-    printf_flush("listen_fd %d\n", listen_fd);
-
-    struct sockaddr_in servaddr;
-    init_sockaddr_from_args(&servaddr, argc, argv, "0.0.0.0");
-
-    bind_e(listen_fd, (sa *)&servaddr, sizeof(servaddr));
-    listen_e(listen_fd, 10);
-
-    char server_ip_port[IP_PORT_STRING_SIZE];
-    get_ip_port((sa *)&servaddr, server_ip_port);
-    printf_flush("listen on %s \nwaiting for client connect...\n", server_ip_port);
-
+    int listen_fd = socket_create_bind_listen(argc, argv);
     int connect_fd;
     struct sockaddr cliaddr;
     socklen_t addrlen = sizeof(cliaddr);
@@ -72,6 +55,7 @@ int main(int argc, char *argv[])
         }
         close_e(connect_fd);
     }
+
     close_e(listen_fd);
-    return 0;
+    exit(0);
 }

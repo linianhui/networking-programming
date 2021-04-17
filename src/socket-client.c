@@ -1,4 +1,5 @@
 #include "cnp.h"
+
 void cli(FILE *input, int connect_fd)
 {
     char recv_buf[BUFFER_SIZE];
@@ -26,21 +27,7 @@ void cli(FILE *input, int connect_fd)
 
 int main(int argc, char *argv[])
 {
-    register_signal();
-
-    pid_t pid = getpid();
-    printf_flush("client srart pid %d\n", pid);
-
-    int connect_fd = create_socket();
-    printf_flush("connect_fd %d\n", connect_fd);
-    struct sockaddr_in servaddr;
-    init_sockaddr_from_args(&servaddr, argc, argv, "127.0.0.1");
-
-    connect_e(connect_fd, (sa *)&servaddr, sizeof(servaddr));
-
-    char server_ip_port[IP_PORT_STRING_SIZE];
-    get_ip_port((sa *)&servaddr, server_ip_port);
-    printf_flush("connected to server %s\n", server_ip_port);
+    int connect_fd = socket_create_connect(argc, argv);
 
     cli(stdin, connect_fd);
 

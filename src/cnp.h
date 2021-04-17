@@ -75,3 +75,7 @@ int get_remote_ip_port(int sockfd, char *ip_port);
 int get_local_prompt(int sockfd, char *prompt);
 
 int get_remote_prompt(int sockfd, char *prompt);
+
+int socket_create_bind_listen(int argc, char *argv[]);
+
+int socket_create_connect(int argc, char *argv[]);

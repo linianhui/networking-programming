@@ -234,3 +234,46 @@ int get_remote_prompt(int sockfd, char *prompt)
     sprintf(prompt, "[remote %s]>", ip_port);
     return 0;
 }
+
+int socket_create_bind_listen(int argc, char *argv[])
+{
+    register_signal();
+
+    pid_t pid = getpid();
+    printf_flush("server srart pid %d\n", pid);
+
+    int listen_fd = create_socket();
+    printf_flush("listen_fd %d\n", listen_fd);
+
+    struct sockaddr_in servaddr;
+    init_sockaddr_from_args(&servaddr, argc, argv, "0.0.0.0");
+
+    bind_e(listen_fd, (sa *)&servaddr, sizeof(servaddr));
+    listen_e(listen_fd, 10);
+
+    char server_ip_port[IP_PORT_STRING_SIZE];
+    get_ip_port((sa *)&servaddr, server_ip_port);
+    printf_flush("listen on %s \nwaiting for client connect...\n", server_ip_port);
+    return listen_fd;
+}
+
+int socket_create_connect(int argc, char *argv[])
+{
+    register_signal();
+
+    pid_t pid = getpid();
+    printf_flush("client srart pid %d\n", pid);
+
+    int connect_fd = create_socket();
+    printf_flush("connect_fd %d\n", connect_fd);
+    struct sockaddr_in servaddr;
+    init_sockaddr_from_args(&servaddr, argc, argv, "127.0.0.1");
+
+    connect_e(connect_fd, (sa *)&servaddr, sizeof(servaddr));
+
+    char server_ip_port[IP_PORT_STRING_SIZE];
+    get_ip_port((sa *)&servaddr, server_ip_port);
+    printf_flush("connected to server %s\n", server_ip_port);
+
+    return connect_fd;
+}
