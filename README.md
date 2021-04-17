@@ -6,11 +6,13 @@
 # 编译
 make
 
-# 启动server
+# 启动server，随意其中的一个
 ./bin/socket-server
+./bin/select-server
 
-# 启动client
+# 启动client，可同时启动多个
 ./bin/socket-client
+./bin/select-client
 ```
 ## docker
 
