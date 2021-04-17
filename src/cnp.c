@@ -240,7 +240,7 @@ int socket_create_bind_listen(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    printf_flush("server srart pid %d\n", pid);
+    printf_flush("%s srart pid %d\n", argv[0], pid);
 
     int listen_fd = create_socket();
     printf_flush("listen_fd %d\n", listen_fd);
@@ -262,7 +262,7 @@ int socket_create_connect(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    printf_flush("client srart pid %d\n", pid);
+    printf_flush("%s srart pid %d\n", argv[0], pid);
 
     int connect_fd = create_socket();
     printf_flush("connect_fd %d\n", connect_fd);
