@@ -33,7 +33,7 @@ void cli(FILE *input, int connect_fd)
             bzero(send_buf, sizeof(send_buf));
             if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
             {
-                return;
+                break;
             }
             send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
         }
@@ -45,19 +45,22 @@ void cli(FILE *input, int connect_fd)
             recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
             if (recv_size == 0)
             {
-                printf_flush("recv server FIN");
-                return;
+                printf("\nrecv server FIN");
+                close_e(connect_fd);
+                break;
             }
+            else
+            {
+                // 打印server响应
+                bzero(remote_prompt, sizeof(remote_prompt));
+                get_remote_prompt(connect_fd, remote_prompt);
+                printf_flush("%s %s", remote_prompt, recv_buf);
 
-            // 打印server响应
-            bzero(remote_prompt, sizeof(remote_prompt));
-            get_remote_prompt(connect_fd, remote_prompt);
-            printf_flush("%s %s", remote_prompt, recv_buf);
-
-            // 打印用户输入提示符
-            bzero(local_prompt, sizeof(local_prompt));
-            get_local_prompt(connect_fd, local_prompt);
-            printf_flush("%s ", local_prompt);
+                // 打印用户输入提示符
+                bzero(local_prompt, sizeof(local_prompt));
+                get_local_prompt(connect_fd, local_prompt);
+                printf_flush("%s ", local_prompt);
+            }
         }
     }
 }
