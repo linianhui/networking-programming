@@ -11,7 +11,7 @@ typedef struct bitmap
 #define bit_loop(bmp, expr)          \
   for (int i = 0; i < bmp->len; i++) \
   {                                  \
-    if (bit_get(bmp, i))             \
+    if (bit_get(bmp, i) == 1)        \
     {                                \
       expr;                          \
     }                                \

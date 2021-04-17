@@ -6,6 +6,7 @@ bitmap *init_bitmap(size_t size)
     size_t len = (size >> 5) + (size & 1);
     bmp->len = len * 32;
     bmp->data = (unsigned int *)malloc(len * 4);
+    bzero(bmp->data, len * 4);
     return bmp;
 }
 
