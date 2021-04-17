@@ -1,0 +1,17 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      # https://hub.docker.com/_/gcc
+      image: gcc:10.3
+
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v1
+      - name: make build
+        run: make
