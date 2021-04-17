@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include "bitmap.h"
 
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
