@@ -8,7 +8,7 @@ typedef struct bitmap
   unsigned int *data;
 } bitmap;
 
-#define bit_loop(bmp, expr)          \
+#define bitmap_loop(bmp, expr)       \
   for (int i = 0; i < bmp->len; i++) \
   {                                  \
     if (bitmap_get(bmp, i) == 1)     \
