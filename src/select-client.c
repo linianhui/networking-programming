@@ -43,12 +43,12 @@ void cli(FILE *input, int connect_fd)
             if (recv_size == 0)
             {
                 printf("\nrecv server FIN\n");
-                close_e(connect_fd);
-
                 // 打印用户输入提示符
                 bzero(local_prompt, sizeof(local_prompt));
                 get_local_prompt(connect_fd, local_prompt);
                 printf_flush("%s ", local_prompt);
+
+                close_e(connect_fd);
                 continue;
             }
             else
