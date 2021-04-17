@@ -4,14 +4,14 @@ void cli(FILE *input, int connect_fd)
 {
     int input_fd = fileno(input);
     int max_fd;
-    fd_set set;
+    fd_set read_fd_set;
 
     char recv_buf[BUFFER_SIZE];
     char send_buf[BUFFER_SIZE];
     char local_prompt[PROMPT_SIZE];
     char remote_prompt[PROMPT_SIZE];
 
-    FD_ZERO(&set);
+    FD_ZERO(&read_fd_set);
 
     ssize_t recv_size = 0;
 
@@ -20,15 +20,15 @@ void cli(FILE *input, int connect_fd)
 
     while (1)
     {
-        FD_SET(input_fd, &set);
-        FD_SET(connect_fd, &set);
+        FD_SET(input_fd, &read_fd_set);
+        FD_SET(connect_fd, &read_fd_set);
         max_fd = imax(input_fd, connect_fd) + 1;
 
         // 获取可读的fd，阻塞
-        select(max_fd, &set, NULL, NULL, NULL);
+        select(max_fd, &read_fd_set, NULL, NULL, NULL);
 
         // 读取用户输入，非阻塞
-        if (FD_ISSET(input_fd, &set))
+        if (FD_ISSET(input_fd, &read_fd_set))
         {
             bzero(send_buf, sizeof(send_buf));
             if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
@@ -39,7 +39,7 @@ void cli(FILE *input, int connect_fd)
         }
 
         // 接收server响应，非阻塞
-        if (FD_ISSET(connect_fd, &set))
+        if (FD_ISSET(connect_fd, &read_fd_set))
         {
             bzero(recv_buf, sizeof(recv_buf));
             recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
