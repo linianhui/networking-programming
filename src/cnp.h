@@ -34,6 +34,8 @@ typedef struct sockaddr sa;
     fflush(stdout);               \
   }
 
+#define imax(x, y) (x > y ? x : y)
+
 void register_signal();
 
 void signal_handler(int signo);
