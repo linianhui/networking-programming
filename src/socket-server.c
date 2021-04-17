@@ -1,13 +1,13 @@
 #include "cnp.h"
 
-void echo(int connect_fd, struct sockaddr *cliaddr)
+void echo(int connect_fd)
 {
     pid_t pid = getpid();
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
 
     char client_ip_port[IP_PORT_STRING_SIZE];
-    get_ip_port(cliaddr, client_ip_port);
+    get_remote_ip_port(connect_fd, client_ip_port);
 
     printf_flush("\nclient %s connected\n", client_ip_port);
     printf_flush("server pid %d connect_fd %d handler\n", pid, connect_fd);
@@ -35,23 +35,20 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
         }
     }
     printf_flush("server pid %d connect_fd %d close connect\n", pid, connect_fd);
-    close_e(connect_fd);
 }
 
 int main(int argc, char *argv[])
 {
     int listen_fd = socket_create_bind_listen(argc, argv);
     int connect_fd;
-    struct sockaddr cliaddr;
-    socklen_t addrlen = sizeof(cliaddr);
 
     while (1)
     {
         // 获取已建立的连接，阻塞。
-        connect_fd = accept_e(listen_fd, &cliaddr, &addrlen);
+        connect_fd = accept_e(listen_fd, NULL, NULL);
         if (fork() == 0)
         {
-            echo(connect_fd, &cliaddr);
+            echo(connect_fd);
             exit(0);
         }
         close_e(connect_fd);
