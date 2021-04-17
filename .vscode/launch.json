@@ -5,7 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "debug socket-client",
+      "name": "launch select-client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/select-client",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
+      "name": "launch socket-client",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/socket-client",
@@ -18,7 +31,7 @@
       "preLaunchTask": "make-debug-build"
     },
     {
-      "name": "socket-server",
+      "name": "launch socket-server",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/socket-server",
