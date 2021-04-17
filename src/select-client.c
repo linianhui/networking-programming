@@ -23,21 +23,18 @@ void cli(FILE *input, int connect_fd)
         FD_SET(input_fd, &read_fd_set);
         FD_SET(connect_fd, &read_fd_set);
         max_fd = imax(input_fd, connect_fd) + 1;
-
         // 获取可读的fd，阻塞
         select(max_fd, &read_fd_set, NULL, NULL, NULL);
-
         // 读取用户输入，非阻塞
         if (FD_ISSET(input_fd, &read_fd_set))
         {
             bzero(send_buf, sizeof(send_buf));
             if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
             {
-                break;
+                continue;
             }
             send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
         }
-
         // 接收server响应，非阻塞
         if (FD_ISSET(connect_fd, &read_fd_set))
         {
@@ -47,7 +44,12 @@ void cli(FILE *input, int connect_fd)
             {
                 printf("\nrecv server FIN\n");
                 close_e(connect_fd);
-                break;
+
+                // 打印用户输入提示符
+                bzero(local_prompt, sizeof(local_prompt));
+                get_local_prompt(connect_fd, local_prompt);
+                printf_flush("%s ", local_prompt);
+                continue;
             }
             else
             {
