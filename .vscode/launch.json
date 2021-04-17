@@ -18,6 +18,19 @@
       "preLaunchTask": "make-debug-build"
     },
     {
+      "name": "launch select-server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/select-server",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
       "name": "launch socket-client",
       "type": "cppdbg",
       "request": "launch",
