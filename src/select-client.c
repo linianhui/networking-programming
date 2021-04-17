@@ -11,8 +11,6 @@ void cli(FILE *input, int connect_fd)
     char local_prompt[PROMPT_SIZE];
     char remote_prompt[PROMPT_SIZE];
 
-    FD_ZERO(&read_fd_set);
-
     ssize_t recv_size = 0;
 
     get_local_prompt(connect_fd, local_prompt);
@@ -20,6 +18,8 @@ void cli(FILE *input, int connect_fd)
 
     while (1)
     {
+        // 每次都需要重新设置，因为select返回时会重置read_fd_set
+        FD_ZERO(&read_fd_set);
         FD_SET(input_fd, &read_fd_set);
         FD_SET(connect_fd, &read_fd_set);
         max_fd = imax(input_fd, connect_fd) + 1;
