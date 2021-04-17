@@ -2,7 +2,7 @@ SRC=src
 BIN=bin
 CFLAG=
 
-all: init socket-client socket-server
+all: init socket-client socket-server select-client
 
 init:
 	mkdir -p $(BIN)
@@ -12,3 +12,6 @@ socket-client:
 
 socket-server:
 	gcc $(CFLAG) $(SRC)/cnp.c $(SRC)/socket-server.c -o $(BIN)/socket-server
+
+select-client:
+	gcc $(CFLAG) $(SRC)/cnp.c $(SRC)/select-client.c -o $(BIN)/select-client
