@@ -269,6 +269,7 @@ int socket_create_connect(int argc, char *argv[])
     struct sockaddr_in servaddr;
     init_sockaddr_from_args(&servaddr, argc, argv, "127.0.0.1");
 
+    // 建立连接，阻塞
     connect_e(connect_fd, (sa *)&servaddr, sizeof(servaddr));
 
     char server_ip_port[IP_PORT_STRING_SIZE];

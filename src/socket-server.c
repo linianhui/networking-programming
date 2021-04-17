@@ -15,11 +15,10 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
     int recv_size;
     char local_prompt[PROMPT_SIZE];
     char remote_prompt[PROMPT_SIZE];
+    // 读取接收的数据，阻塞
     while ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
     {
-        bzero(local_prompt, sizeof(local_prompt));
         bzero(remote_prompt, sizeof(remote_prompt));
-
         get_remote_prompt(connect_fd, remote_prompt);
         printf_flush("%s %s", remote_prompt, buf);
 
@@ -30,6 +29,7 @@ void echo(int connect_fd, struct sockaddr *cliaddr)
 
         if (send_e(connect_fd, buf, recv_size + 1, 0) > 0)
         {
+            bzero(local_prompt, sizeof(local_prompt));
             get_local_prompt(connect_fd, remote_prompt);
             printf_flush("%s %s", remote_prompt, buf);
         }
@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+        // 获取已建立的连接，阻塞。
         connect_fd = accept_e(listen_fd, &cliaddr, &addrlen);
         if (fork() == 0)
         {
