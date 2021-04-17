@@ -45,7 +45,7 @@ void cli(FILE *input, int connect_fd)
             recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
             if (recv_size == 0)
             {
-                printf("\nrecv server FIN");
+                printf("\nrecv server FIN\n");
                 close_e(connect_fd);
                 break;
             }
