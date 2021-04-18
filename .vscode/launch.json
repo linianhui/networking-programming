@@ -5,6 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "launch poll-client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/poll-client",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
       "name": "launch select-client",
       "type": "cppdbg",
       "request": "launch",
