@@ -5,6 +5,32 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "launch epoll-client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/epoll-client",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
+      "name": "launch epoll-server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/epoll-server",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
       "name": "launch poll-client",
       "type": "cppdbg",
       "request": "launch",

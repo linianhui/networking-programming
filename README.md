@@ -10,11 +10,13 @@ make
 ./bin/socket-server
 ./bin/select-server
 ./bin/poll-server
+./bin/epoll-server
 
 # 启动client，可同时启动多个
 ./bin/socket-client
 ./bin/select-client
 ./bin/poll-client
+./bin/epoll-client
 ```
 ## docker
 
