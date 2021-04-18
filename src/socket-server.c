@@ -17,9 +17,7 @@ void echo(int connect_fd)
     }
 }
 
-int main(int argc, char *argv[])
-{
-    int listen_fd = socket_create_bind_listen(argc, argv);
+void fork_handler(int listen_fd){
     int connect_fd;
 
     while (1)
@@ -33,7 +31,11 @@ int main(int argc, char *argv[])
         }
         close_e(connect_fd);
     }
+}
 
-    close_e(listen_fd);
-    exit(0);
+int main(int argc, char *argv[])
+{
+    int listen_fd = socket_create_bind_listen(argc, argv);
+    fork_handler(listen_fd);
+    return 0;
 }

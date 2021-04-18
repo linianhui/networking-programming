@@ -55,8 +55,6 @@ void cli(FILE *input, int connect_fd)
 int main(int argc, char *argv[])
 {
     int connect_fd = socket_create_connect(argc, argv);
-
     cli(stdin, connect_fd);
-
-    exit(0);
+    return 0;
 }

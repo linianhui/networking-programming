@@ -7,10 +7,8 @@ int echo(int connect_fd)
     return socket_revc_and_send(connect_fd, buf);
 }
 
-int main(int argc, char *argv[])
+int select_handler(int listen_fd)
 {
-    int listen_fd = socket_create_bind_listen(argc, argv);
-
     bitmap *connect_fd_set = bitmap_init(1024);
 
     fd_set read_fd_set;
@@ -43,7 +41,11 @@ int main(int argc, char *argv[])
                 }
             });
     }
+}
 
-    close_e(listen_fd);
-    exit(0);
+int main(int argc, char *argv[])
+{
+    int listen_fd = socket_create_bind_listen(argc, argv);
+    select_handler(listen_fd);
+    return 0;
 }

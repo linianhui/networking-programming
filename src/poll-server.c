@@ -8,10 +8,8 @@ int echo(int connect_fd)
     return socket_revc_and_send(connect_fd, buf);
 }
 
-int main(int argc, char *argv[])
+void poll_handler(int listen_fd)
 {
-    int listen_fd = socket_create_bind_listen(argc, argv);
-
     int max_fd = 1025;
     struct pollfd poll_fd_array[max_fd];
 
@@ -54,7 +52,11 @@ int main(int argc, char *argv[])
             }
         }
     }
+}
 
-    close_e(listen_fd);
-    exit(0);
+int main(int argc, char *argv[])
+{
+    int listen_fd = socket_create_bind_listen(argc, argv);
+    poll_handler(listen_fd);
+    return 0;
 }
