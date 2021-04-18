@@ -11,7 +11,7 @@ void cli(FILE *input, int connect_fd)
     ssize_t recv_size = 0;
 
     get_local_prompt(connect_fd, local_prompt);
-    printf_flush("%s ", local_prompt);
+    log_debug("%s ", local_prompt);
 
     int input_fd = fileno(input);
     int max_fd = imax(input_fd, connect_fd) + 1;
@@ -51,7 +51,7 @@ void cli(FILE *input, int connect_fd)
                 // 打印用户输入提示符
                 bzero(local_prompt, sizeof(local_prompt));
                 get_local_prompt(connect_fd, local_prompt);
-                printf_flush("%s ", local_prompt);
+                log_debug("%s ", local_prompt);
 
                 close_e(connect_fd);
                 continue;
@@ -61,12 +61,12 @@ void cli(FILE *input, int connect_fd)
                 // 打印server响应
                 bzero(remote_prompt, sizeof(remote_prompt));
                 get_remote_prompt(connect_fd, remote_prompt);
-                printf_flush("%s %s", remote_prompt, recv_buf);
+                log_debug("%s %s", remote_prompt, recv_buf);
 
                 // 打印用户输入提示符
                 bzero(local_prompt, sizeof(local_prompt));
                 get_local_prompt(connect_fd, local_prompt);
-                printf_flush("%s ", local_prompt);
+                log_debug("%s ", local_prompt);
             }
         }
     }

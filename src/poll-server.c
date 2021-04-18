@@ -14,7 +14,7 @@ void echo(int connect_fd)
     {
         bzero(remote_prompt, sizeof(remote_prompt));
         get_remote_prompt(connect_fd, remote_prompt);
-        printf_flush("%s %s", remote_prompt, buf);
+        log_debug("%s %s", remote_prompt, buf);
 
         for (size_t i = 0; i < recv_size; i++)
         {
@@ -25,7 +25,7 @@ void echo(int connect_fd)
         {
             bzero(local_prompt, sizeof(local_prompt));
             get_local_prompt(connect_fd, remote_prompt);
-            printf_flush("%s %s", remote_prompt, buf);
+            log_debug("%s %s", remote_prompt, buf);
         }
     }
 }

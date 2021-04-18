@@ -8,7 +8,7 @@ void cli(FILE *input, int connect_fd)
     char remote_prompt[PROMPT_SIZE];
 
     get_local_prompt(connect_fd, local_prompt);
-    printf_flush("%s ", local_prompt);
+    log_debug("%s ", local_prompt);
 
     while (1)
     {
@@ -24,12 +24,12 @@ void cli(FILE *input, int connect_fd)
         // 打印server响应
         bzero(remote_prompt, sizeof(remote_prompt));
         get_remote_prompt(connect_fd, remote_prompt);
-        printf_flush("%s %s", remote_prompt, recv_buf);
+        log_debug("%s %s", remote_prompt, recv_buf);
 
         // 打印用户输入提示符
         bzero(local_prompt, sizeof(local_prompt));
         get_local_prompt(connect_fd, local_prompt);
-        printf_flush("%s ", local_prompt);
+        log_debug("%s ", local_prompt);
     }
 }
 

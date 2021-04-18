@@ -9,8 +9,8 @@ void echo(int connect_fd)
     char client_ip_port[IP_PORT_STRING_SIZE];
     get_remote_ip_port(connect_fd, client_ip_port);
 
-    printf_flush("\nclient %s connected\n", client_ip_port);
-    printf_flush("server pid %d connect_fd %d handler\n", pid, connect_fd);
+    log_debug("\nclient %s connected\n", client_ip_port);
+    log_debug("server pid %d connect_fd %d handler\n", pid, connect_fd);
 
     int recv_size;
     char local_prompt[PROMPT_SIZE];
@@ -20,7 +20,7 @@ void echo(int connect_fd)
     {
         bzero(remote_prompt, sizeof(remote_prompt));
         get_remote_prompt(connect_fd, remote_prompt);
-        printf_flush("%s %s", remote_prompt, buf);
+        log_debug("%s %s", remote_prompt, buf);
 
         for (size_t i = 0; i < recv_size; i++)
         {
@@ -31,10 +31,10 @@ void echo(int connect_fd)
         {
             bzero(local_prompt, sizeof(local_prompt));
             get_local_prompt(connect_fd, remote_prompt);
-            printf_flush("%s %s", remote_prompt, buf);
+            log_debug("%s %s", remote_prompt, buf);
         }
     }
-    printf_flush("server pid %d connect_fd %d close connect\n", pid, connect_fd);
+    log_debug("server pid %d connect_fd %d close connect\n", pid, connect_fd);
 }
 
 int main(int argc, char *argv[])

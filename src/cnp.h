@@ -29,7 +29,7 @@ typedef struct sockaddr sa;
     fflush(stderr);                                                 \
   }
 
-#define printf_flush(...)         \
+#define log_debug(...)            \
   {                               \
     fprintf(stdout, __VA_ARGS__); \
     fflush(stdout);               \

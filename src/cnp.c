@@ -12,7 +12,7 @@ void register_signal()
 
 void signal_handler(int signo)
 {
-    printf_flush("\n[signal] %d %s", signo, strsignal(signo));
+    log_debug("\n[signal] %d %s", signo, strsignal(signo));
 }
 
 int create_socket()
@@ -240,10 +240,10 @@ int socket_create_bind_listen(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    printf_flush("%s srart pid %d\n", argv[0], pid);
+    log_debug("%s srart pid %d\n", argv[0], pid);
 
     int listen_fd = create_socket();
-    printf_flush("listen_fd %d\n", listen_fd);
+    log_debug("listen_fd %d\n", listen_fd);
 
     struct sockaddr_in servaddr;
     init_sockaddr_from_args(&servaddr, argc, argv, "0.0.0.0");
@@ -253,7 +253,7 @@ int socket_create_bind_listen(int argc, char *argv[])
 
     char server_ip_port[IP_PORT_STRING_SIZE];
     get_ip_port((sa *)&servaddr, server_ip_port);
-    printf_flush("listen on %s \nwaiting for client connect...\n", server_ip_port);
+    log_debug("listen on %s \nwaiting for client connect...\n", server_ip_port);
     return listen_fd;
 }
 
@@ -262,10 +262,10 @@ int socket_create_connect(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    printf_flush("%s srart pid %d\n", argv[0], pid);
+    log_debug("%s srart pid %d\n", argv[0], pid);
 
     int connect_fd = create_socket();
-    printf_flush("connect_fd %d\n", connect_fd);
+    log_debug("connect_fd %d\n", connect_fd);
     struct sockaddr_in servaddr;
     init_sockaddr_from_args(&servaddr, argc, argv, "127.0.0.1");
 
@@ -274,7 +274,7 @@ int socket_create_connect(int argc, char *argv[])
 
     char server_ip_port[IP_PORT_STRING_SIZE];
     get_ip_port((sa *)&servaddr, server_ip_port);
-    printf_flush("connected to server %s\n", server_ip_port);
+    log_debug("connected to server %s\n", server_ip_port);
 
     return connect_fd;
 }
