@@ -2,30 +2,19 @@
 
 void echo(int connect_fd)
 {
-    pid_t pid = getpid();
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
 
     int recv_size;
-    char local_prompt[PROMPT_SIZE];
-    char remote_prompt[PROMPT_SIZE];
+
     if ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
     {
-        bzero(remote_prompt, sizeof(remote_prompt));
-        get_remote_prompt(connect_fd, remote_prompt);
-        log_debug("%s %s", remote_prompt, buf);
-
         for (size_t i = 0; i < recv_size; i++)
         {
             buf[i] = toupper(buf[i]);
         }
 
-        if (send_e(connect_fd, buf, recv_size + 1, 0) > 0)
-        {
-            bzero(local_prompt, sizeof(local_prompt));
-            get_local_prompt(connect_fd, remote_prompt);
-            log_debug("%s %s", remote_prompt, buf);
-        }
+        send_e(connect_fd, buf, recv_size + 1, 0);
     }
 }
 
