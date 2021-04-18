@@ -2,11 +2,41 @@ version: "3.3"
 
 services:
     socket.server:
-      build: .
-      entrypoint: ["socket-server", "0.0.0.0", "12345"]
+      image: socket
+      entrypoint: ["socket-server"]
+
+    select.server:
+      image: socket
+      entrypoint: ["select-server"]
+
+    poll.server:
+      image: socket
+      entrypoint: ["poll-server"]
+
+    epoll.server:
+      image: socket
+      entrypoint: ["epoll-server"]
 
     socket.client:
-      build: .
+      image: socket
       depends_on:
         - socket.server
-      entrypoint: ["/bin/bash", "-c", "echo hello | socket-client socket.server 12345 -"]
+      entrypoint: ["socket-client", "socket.server"]
+
+    select.client:
+      image: socket
+      depends_on:
+        - select.server
+      entrypoint: ["select-client", "select.server"]
+
+    poll.client:
+      image: socket
+      depends_on:
+        - poll.server
+      entrypoint: ["poll-client", "poll.server"]
+
+    epoll.client:
+      image: socket
+      depends_on:
+        - epoll.server
+      entrypoint: ["epoll-client", "epoll.server"]

@@ -21,9 +21,16 @@ make
 ## docker
 
 ```sh
-# 编译
+# 编译镜像
 docker build -t socket .
+```
 
+```sh
+# 启动所有的
+docker-compose up
+```
+
+```
 # 启动server
 docker run -t --rm --name socket-server socket socket-server
 
