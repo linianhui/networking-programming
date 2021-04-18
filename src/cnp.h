@@ -21,7 +21,7 @@
 
 typedef struct sockaddr sa;
 
-#define printf_error(...)                                           \
+#define log_error(...)                                              \
   {                                                                 \
     int temp = errno;                                               \
     fprintf(stderr, __VA_ARGS__);                                   \
