@@ -1,18 +1,24 @@
 #include "cnp.h"
+#include <signal.h>
 
 void register_signal()
 {
-    // signal(SIGHUP, signal_handler);
-    // signal(SIGINT, signal_handler);
-    // signal(SIGQUIT, signal_handler);
-    // signal(SIGKILL, signal_handler);
-    // signal(SIGTERM, signal_handler);
-    // signal(SIGCHLD, signal_handler);
+    struct sigaction ptr;
+    ptr.sa_flags = 0;
+    ptr.sa_handler = signal_handler;
+
+    sigaction(SIGINT, &ptr, NULL);
+    sigaction(SIGQUIT, &ptr, NULL);
+    sigaction(SIGKILL, &ptr, NULL);
+    sigaction(SIGTERM, &ptr, NULL);
+    //sigaction(SIGHUP, NULl, NULL);
+    //sigaction(SIGCHLD, NULL, NULL);
 }
 
 void signal_handler(int signo)
 {
-    log_debug("\n[signal] %d %s", signo, strsignal(signo));
+    log_debug("\n[SIGNAL] %d %s", signo, strsignal(signo));
+    exit(0);
 }
 
 int create_socket()
