@@ -59,6 +59,7 @@ int socket_e(int domain, int type, int protocol)
         log_error("SOCKET ERROR : create");
         exit(1);
     }
+    log_socket_socket(sockfd);
     return sockfd;
 }
 
@@ -72,6 +73,7 @@ int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         log_error("SOCKET ERROR : bind %s", ip_port);
         exit(2);
     }
+    log_socket_bind(sockfd, addr);
     return result;
 }
 
@@ -85,6 +87,7 @@ int listen_e(int sockfd, int backlog)
         log_error("SOCKET ERROR : listen %s", ip_port);
         exit(3);
     }
+    log_socket_listen(sockfd, backlog);
     return result;
 }
 
@@ -98,6 +101,7 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
         log_error("SOCKET ERROR : connect %s", ip_port);
         exit(4);
     }
+    log_socket_connect(sockfd);
     return result;
 }
 
@@ -111,6 +115,7 @@ int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen)
         log_error("SOCKET ERROR : accept %s", ip_port);
         exit(5);
     }
+    log_socket_accept(sockfd, connect_fd);
     return connect_fd;
 }
 
@@ -124,6 +129,7 @@ ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)
         log_error("SOCKET ERROR : send to %s", ip_port);
         exit(6);
     }
+    log_socket_send(sockfd, (char *)buf);
     return size;
 }
 
@@ -137,6 +143,7 @@ ssize_t recv_e(int sockfd, void *buf, size_t len, int flags)
         log_error("SOCKET ERROR : recv from %s", ip_port);
         exit(7);
     }
+    log_socket_recv(sockfd, (char *)buf);
     return size;
 }
 
@@ -223,7 +230,7 @@ int get_local_prompt(int sockfd, char *prompt)
 {
     char ip_port[IP_PORT_STRING_SIZE];
     get_local_ip_port(sockfd, ip_port);
-    sprintf(prompt, "[local  %s]>", ip_port);
+    sprintf(prompt, "[local  %s] : ", ip_port);
     return 0;
 }
 
@@ -231,7 +238,7 @@ int get_remote_prompt(int sockfd, char *prompt)
 {
     char ip_port[IP_PORT_STRING_SIZE];
     get_remote_ip_port(sockfd, ip_port);
-    sprintf(prompt, "[remote %s]>", ip_port);
+    sprintf(prompt, "[remote %s] : ", ip_port);
     return 0;
 }
 
@@ -240,10 +247,9 @@ int socket_create_bind_listen(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    log_debug("%s srart pid %d\n", argv[0], pid);
+    log_debug("%s srart pid %d", argv[0], pid);
 
     int listen_fd = create_socket();
-    log_debug("listen_fd %d\n", listen_fd);
 
     struct sockaddr_in servaddr;
     init_sockaddr_from_args(&servaddr, argc, argv, "0.0.0.0");
@@ -251,9 +257,6 @@ int socket_create_bind_listen(int argc, char *argv[])
     bind_e(listen_fd, (sa *)&servaddr, sizeof(servaddr));
     listen_e(listen_fd, 10);
 
-    char server_ip_port[IP_PORT_STRING_SIZE];
-    get_ip_port((sa *)&servaddr, server_ip_port);
-    log_debug("listen on %s \nwaiting for client connect...\n", server_ip_port);
     return listen_fd;
 }
 
@@ -262,19 +265,91 @@ int socket_create_connect(int argc, char *argv[])
     register_signal();
 
     pid_t pid = getpid();
-    log_debug("%s srart pid %d\n", argv[0], pid);
+    log_debug("%s srart pid %d", argv[0], pid);
 
     int connect_fd = create_socket();
-    log_debug("connect_fd %d\n", connect_fd);
+
     struct sockaddr_in servaddr;
     init_sockaddr_from_args(&servaddr, argc, argv, "127.0.0.1");
 
     // 建立连接，阻塞
     connect_e(connect_fd, (sa *)&servaddr, sizeof(servaddr));
 
-    char server_ip_port[IP_PORT_STRING_SIZE];
-    get_ip_port((sa *)&servaddr, server_ip_port);
-    log_debug("connected to server %s\n", server_ip_port);
-
     return connect_fd;
+}
+
+void log_stdin_prompt()
+{
+    pid_t pid = getpid();
+    log_debug("[STDIN fgets] pid=%d waiting for input > ", pid);
+}
+
+void log_socket_socket(int sockfd)
+{
+    pid_t pid = getpid();
+
+    log_debug("\n[SOCKET socket] pid=%d sockfd=%d", pid, sockfd);
+}
+
+void log_socket_bind(int listen_fd, const struct sockaddr *addr)
+{
+    char ip_port[IP_PORT_STRING_SIZE];
+    get_ip_port(addr, ip_port);
+
+    pid_t pid = getpid();
+
+    log_debug("\n[SOCKET bind] pid=%d listen_fd=%d bind on %s", pid, listen_fd, ip_port);
+}
+
+void log_socket_listen(int listen_fd, int backlog)
+{
+    pid_t pid = getpid();
+
+    log_debug("\n[SOCKET listen] pid=%d listen_fd=%d backlog=%d waiting for client connect...", pid, listen_fd, backlog);
+}
+
+void log_socket_connect(int connect_fd)
+{
+    char local_ip_port[IP_PORT_STRING_SIZE];
+    char remote_ip_port[IP_PORT_STRING_SIZE];
+
+    get_local_ip_port(connect_fd, local_ip_port);
+    get_remote_ip_port(connect_fd, remote_ip_port);
+    pid_t pid = getpid();
+
+    log_debug("\n[SOCKET connect] %s pid=%d connected to remote=%s on connect_fd=%d\n",
+              local_ip_port, pid, remote_ip_port, connect_fd);
+}
+
+void log_socket_accept(int listen_fd, int connect_fd)
+{
+    char local_ip_port[IP_PORT_STRING_SIZE];
+    char remote_ip_port[IP_PORT_STRING_SIZE];
+
+    get_local_ip_port(connect_fd, local_ip_port);
+    get_remote_ip_port(connect_fd, remote_ip_port);
+    pid_t pid = getpid();
+
+    log_debug("\n[SOCKET accept] %s pid=%d listent_fd=%d accept remote=%s connected on connect_fd=%d\n",
+              local_ip_port, pid, listen_fd, remote_ip_port, connect_fd);
+}
+
+void log_socket_recv(int connect_fd, char *recv_buf)
+{
+    char ip_port[IP_PORT_STRING_SIZE];
+    get_remote_ip_port(connect_fd, ip_port);
+
+    pid_t pid = getpid();
+
+    log_debug("[SOCKET recv] pid=%d connect_fd=%d recv from %s : %s", pid, connect_fd, ip_port, recv_buf);
+}
+
+void log_socket_send(int connect_fd, char *send_buf)
+{
+    char ip_port[IP_PORT_STRING_SIZE];
+    get_remote_ip_port(connect_fd, ip_port);
+
+    pid_t pid = getpid();
+
+    log_debug("[SOCKET send] pid=%d connect_fd=%d send to %s : %s", pid, connect_fd, ip_port, send_buf);
 }
