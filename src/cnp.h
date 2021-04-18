@@ -49,17 +49,17 @@ void init_sockaddr_from_args(struct sockaddr_in *addr, int argc, char *argv[], c
 
 int socket_e(int domain, int type, int protocol);
 
-int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int bind_e(int listen_fd, const struct sockaddr *addr, socklen_t addrlen);
 
-int listen_e(int sockfd, int backlog);
+int listen_e(int listen_fd, int backlog);
 
 int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen);
 
-int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen);
+int accept_e(int listen_fd, struct sockaddr *cliaddr, socklen_t *addrlen);
 
-ssize_t send_e(int sockfd, const void *buf, size_t len, int flags);
+ssize_t send_e(int connect_fd, const void *buf, size_t len, int flags);
 
-ssize_t recv_e(int sockfd, void *buf, size_t len, int flags);
+ssize_t recv_e(int connect_fd, void *buf, size_t len, int flags);
 
 int close_e(int fd);
 

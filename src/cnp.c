@@ -63,31 +63,31 @@ int socket_e(int domain, int type, int protocol)
     return sockfd;
 }
 
-int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+int bind_e(int listen_fd, const struct sockaddr *addr, socklen_t addrlen)
 {
-    int result = bind(sockfd, addr, addrlen);
+    int result = bind(listen_fd, addr, addrlen);
     if (result == -1)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(addr, ip_port);
-        log_error("\nSOCKET ERROR : bind %s", ip_port);
+        log_error("\nSOCKET ERROR : listen_fd=%d bind %s", listen_fd, ip_port);
         return -1;
     }
-    log_socket_bind(sockfd, addr);
+    log_socket_bind(listen_fd, addr);
     return result;
 }
 
-int listen_e(int sockfd, int backlog)
+int listen_e(int listen_fd, int backlog)
 {
-    int result = listen(sockfd, backlog);
+    int result = listen(listen_fd, backlog);
     if (result == -1)
     {
         char ip_port[IP_PORT_STRING_SIZE];
-        get_local_ip_port(sockfd, ip_port);
-        log_error("\nSOCKET ERROR : listen %s", ip_port);
+        get_local_ip_port(listen_fd, ip_port);
+        log_error("\nSOCKET ERROR : listen_fd=%d backlog=%d %s", listen_fd, backlog, ip_port);
         return -1;
     }
-    log_socket_listen(sockfd, backlog);
+    log_socket_listen(listen_fd, backlog);
     return result;
 }
 
@@ -105,45 +105,45 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
     return result;
 }
 
-int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen)
+int accept_e(int listen_fd, struct sockaddr *cliaddr, socklen_t *addrlen)
 {
-    int connect_fd = accept(sockfd, cliaddr, addrlen);
+    int connect_fd = accept(listen_fd, cliaddr, addrlen);
     if (connect_fd == -1)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(cliaddr, ip_port);
-        log_error("\nSOCKET ERROR : accept %s", ip_port);
+        log_error("\nSOCKET ERROR : listen_fd=%d accept %s on connect_fd=%d", listen_fd, ip_port, connect_fd);
         return -1;
     }
-    log_socket_accept(sockfd, connect_fd);
+    log_socket_accept(listen_fd, connect_fd);
     return connect_fd;
 }
 
-ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)
+ssize_t send_e(int connect_fd, const void *buf, size_t len, int flags)
 {
-    ssize_t size = send(sockfd, buf, len, flags);
+    ssize_t size = send(connect_fd, buf, len, flags);
     if (size == -1)
     {
         char ip_port[IP_PORT_STRING_SIZE];
-        get_remote_ip_port(sockfd, ip_port);
-        log_error("\nSOCKET ERROR : send to %s", ip_port);
+        get_remote_ip_port(connect_fd, ip_port);
+        log_error("\nSOCKET ERROR : connect_fd-%d send to %s", connect_fd, ip_port);
         return -1;
     }
-    log_socket_send(sockfd, (char *)buf);
+    log_socket_send(connect_fd, (char *)buf);
     return size;
 }
 
-ssize_t recv_e(int sockfd, void *buf, size_t len, int flags)
+ssize_t recv_e(int connect_fd, void *buf, size_t len, int flags)
 {
-    ssize_t size = recv(sockfd, buf, len, flags);
+    ssize_t size = recv(connect_fd, buf, len, flags);
     if (size == -1)
     {
         char ip_port[IP_PORT_STRING_SIZE];
-        get_remote_ip_port(sockfd, ip_port);
-        log_error("\nSOCKET ERROR : recv from %s", ip_port);
+        get_remote_ip_port(connect_fd, ip_port);
+        log_error("\nSOCKET ERROR : connect_fd=%d recv from %s", connect_fd, ip_port);
         return -1;
     }
-    log_socket_recv(sockfd, (char *)buf);
+    log_socket_recv(connect_fd, (char *)buf);
     // 0代表接收到了remote发送的FIN，代表关闭连接。
     if (size == 0)
     {
@@ -169,7 +169,7 @@ int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     int result = getsockname(sockfd, addr, addrlen);
     if (result == -1)
     {
-        log_error("SOCKET ERROR : getsockname");
+        log_error("SOCKET ERROR : getsockname fd=%fd", sockfd);
         exit(9);
     }
     return result;
@@ -180,7 +180,7 @@ int getpeername_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     int result = getpeername(sockfd, addr, addrlen);
     if (result == -1)
     {
-        log_error("SOCKET ERROR : getpeername");
+        log_error("SOCKET ERROR : getpeername fd=%d", sockfd);
         exit(10);
     }
     return result;
