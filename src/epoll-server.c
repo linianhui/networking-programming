@@ -1,5 +1,5 @@
 #include "cnp.h"
-#include <poll.h>
+#include <sys/epoll.h>
 
 int echo(int connect_fd)
 {
@@ -8,46 +8,67 @@ int echo(int connect_fd)
     return socket_revc_and_send(connect_fd, buf);
 }
 
-void poll_handler(int listen_fd)
+void epoll_ctl_add(int epoll_fd, int fd)
 {
-    int max_fd = 1025;
-    struct pollfd poll_fd_array[max_fd];
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fd;
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev);
+}
 
-    // 添加listen_fd, 关注POLLIN事件
-    poll_fd_array[0].fd = listen_fd;
-    poll_fd_array[0].events = POLLIN;
+void epoll_ctl_del(int epoll_fd, int fd)
+{
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fd;
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, &ev);
+}
 
-    int fd_count = 1;
-    int connect_fd;
+void epoll_handler(int listen_fd)
+{
+    int epoll_fd = epoll_create(1024);
+    epoll_ctl_add(epoll_fd, listen_fd);
+
+    int index;
+    int fd;
+    uint32_t events;
+
+    int event_count = 4;
+    struct epoll_event event_array[event_count];
+
     while (1)
     {
-        // 每次重新复制poll_fd_array到kernel
-        poll(poll_fd_array, fd_count, -1);
+        bzero(event_array, sizeof(event_array));
 
-        // 当listen_fd可读时，把获取的连接的fd放入poll_fd_array
-        if (poll_fd_array[0].revents & POLLIN)
+        // 每次返回指定数量的可读fd
+        epoll_wait(epoll_fd, event_array, event_count, -1);
+        for (index = 0; index < event_count; index++)
         {
-            poll_fd_array[fd_count].fd = accept_e(listen_fd, NULL, NULL);
-            poll_fd_array[fd_count].events = POLLIN;
-            fd_count++;
-        }
-
-        // 循环检查connect_fd是否可读，可读就用echo处理
-        // 从1开始是跳过0位置的listen_fd。
-        for (int i = 1; i < fd_count; i++)
-        {
-            connect_fd = poll_fd_array[i].fd;
-            if (connect_fd < 0)
+            fd = event_array[index].data.fd;
+            if (fd < 0)
             {
                 continue;
             }
-            // 如果可读，就echo处理
-            if (poll_fd_array[i].revents & POLLIN)
+
+            events = event_array[index].events;
+
+            // 当listen_fd可读，把获取的连接的fd放入epoll_fd
+            if (fd == listen_fd)
             {
-                if (echo(connect_fd) == 0)
+                if (events & EPOLLIN)
                 {
-                    poll_fd_array[i].fd = -1;
-                    close_e(connect_fd);
+                    epoll_ctl_add(epoll_fd, accept_e(listen_fd, NULL, NULL));
+                }
+                continue;
+            }
+
+            // 当connect_fd可读时，交由echo处理
+            if (events & EPOLLIN)
+            {
+                if (echo(fd) == 0)
+                {
+                    epoll_ctl_del(epoll_fd, fd);
+                    close_e(fd);
                 }
             }
         }
@@ -57,6 +78,6 @@ void poll_handler(int listen_fd)
 int main(int argc, char *argv[])
 {
     int listen_fd = socket_create_bind_listen(argc, argv);
-    poll_handler(listen_fd);
+    epoll_handler(listen_fd);
     return 0;
 }
