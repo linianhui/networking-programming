@@ -18,6 +18,19 @@
       "preLaunchTask": "make-debug-build"
     },
     {
+      "name": "launch poll-server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/poll-server",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "make-debug-build"
+    },
+    {
       "name": "launch select-client",
       "type": "cppdbg",
       "request": "launch",
