@@ -1,53 +1,73 @@
 #include "cnp.h"
-#include <poll.h>
+#include <sys/epoll.h>
+
+void epoll_ctl_add(int epoll_fd, int fd)
+{
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fd;
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev);
+}
+
+void epoll_ctl_del(int epoll_fd, int fd)
+{
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = fd;
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, &ev);
+}
 
 void cli(FILE *input, int connect_fd)
 {
     char recv_buf[BUFFER_SIZE];
     char send_buf[BUFFER_SIZE];
 
-    ssize_t recv_size = 0;
-
     log_stdin_prompt();
 
+    int event_count = 2;
+    struct epoll_event event_array[event_count];
+
     int input_fd = fileno(input);
-    int max_fd = imax(input_fd, connect_fd) + 1;
-    struct pollfd poll_fd_array[2];
+    int epoll_fd = epoll_create(event_count);
 
-    // 添加input_fd, 关注POLLIN事件
-    poll_fd_array[0].fd = input_fd;
-    poll_fd_array[0].events = POLLIN;
+    epoll_ctl_add(epoll_fd, input_fd);
+    epoll_ctl_add(epoll_fd, connect_fd);
 
-    // 添加connect_fd, 关注POLLIN事件
-    poll_fd_array[1].fd = connect_fd;
-    poll_fd_array[1].events = POLLIN;
+    ssize_t recv_size = 0;
+    int i, fd;
+    uint32_t events;
 
     while (1)
     {
         // 获取可读的fd，阻塞
-        poll(poll_fd_array, max_fd, -1);
+        epoll_wait(epoll_fd, event_array, event_count, -1);
 
-        // 读取用户输入，非阻塞
-        if (poll_fd_array[0].revents & POLLIN)
+        for (i = 0; i < 2; i++)
         {
-            bzero(send_buf, sizeof(send_buf));
-            if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
+            fd = event_array[i].data.fd;
+            events = event_array[i].events;
+
+            if (fd == connect_fd && (events & EPOLLIN))
             {
+                bzero(recv_buf, sizeof(recv_buf));
+                recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
+                if (recv_size == 0)
+                {
+                    epoll_ctl_del(epoll_fd, connect_fd);
+                }
+                log_stdin_prompt();
                 continue;
             }
-            send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
-        }
-        // 接收server响应，非阻塞
-        if (poll_fd_array[1].revents & POLLIN)
-        {
-            bzero(recv_buf, sizeof(recv_buf));
-            recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
-            if (recv_size == 0)
+
+            if (fd == input_fd && (events & EPOLLIN))
             {
-                close_e(connect_fd);
-                continue;
+                bzero(send_buf, sizeof(send_buf));
+                if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
+                {
+                    continue;
+                }
+                send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
             }
-            log_stdin_prompt();
         }
     }
 }
