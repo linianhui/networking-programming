@@ -1,4 +1,5 @@
 #include "cnp.h"
+#include <poll.h>
 
 void cli(FILE *input, int connect_fd)
 {
@@ -14,20 +15,23 @@ void cli(FILE *input, int connect_fd)
 
     int input_fd = fileno(input);
     int max_fd = imax(input_fd, connect_fd) + 1;
-    fd_set read_fd_set;
+    struct pollfd poll_fd_array[2];
+
+    // 添加input_fd, 关注POLLIN事件
+    poll_fd_array[0].fd = input_fd;
+    poll_fd_array[0].events = POLLIN;
+
+    // 添加connect_fd, 关注POLLIN事件
+    poll_fd_array[1].fd = connect_fd;
+    poll_fd_array[1].events = POLLIN;
 
     while (1)
     {
-        // 每次都需要重新设置，因为select返回时会重置read_fd_set
-        FD_ZERO(&read_fd_set);
-        FD_SET(input_fd, &read_fd_set);
-        FD_SET(connect_fd, &read_fd_set);
-
         // 获取可读的fd，阻塞
-        select(max_fd, &read_fd_set, NULL, NULL, NULL);
+        poll(poll_fd_array, max_fd, -1);
 
         // 读取用户输入，非阻塞
-        if (FD_ISSET(input_fd, &read_fd_set))
+        if (poll_fd_array[0].revents & POLLIN)
         {
             bzero(send_buf, sizeof(send_buf));
             if (fgets(send_buf, BUFFER_SIZE, input) == NULL)
@@ -37,7 +41,7 @@ void cli(FILE *input, int connect_fd)
             send_e(connect_fd, send_buf, strlen(send_buf) + 1, 0);
         }
         // 接收server响应，非阻塞
-        if (FD_ISSET(connect_fd, &read_fd_set))
+        if (poll_fd_array[1].revents & POLLIN)
         {
             bzero(recv_buf, sizeof(recv_buf));
             recv_size = recv_e(connect_fd, recv_buf, BUFFER_SIZE, 0);
