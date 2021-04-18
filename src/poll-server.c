@@ -1,22 +1,11 @@
 #include "cnp.h"
 #include <poll.h>
 
-void echo(int connect_fd)
+int echo(int connect_fd)
 {
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
-
-    int recv_size;
-
-    if ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
-    {
-        for (size_t i = 0; i < recv_size; i++)
-        {
-            buf[i] = toupper(buf[i]);
-        }
-
-        send_e(connect_fd, buf, recv_size + 1, 0);
-    }
+    return socket_revc_and_send(connect_fd, buf);
 }
 
 int main(int argc, char *argv[])
@@ -31,7 +20,7 @@ int main(int argc, char *argv[])
     poll_fd_array[0].events = POLLIN;
 
     int fd_count = 1;
-
+    int connect_fd;
     while (1)
     {
         // 每次重新复制poll_fd_array到kernel
@@ -49,14 +38,19 @@ int main(int argc, char *argv[])
         // 从1开始是跳过0位置的listen_fd。
         for (int i = 1; i < fd_count; i++)
         {
-            if (poll_fd_array[i].fd < 0)
+            connect_fd = poll_fd_array[i].fd;
+            if (connect_fd < 0)
             {
                 continue;
             }
             // 如果可读，就echo处理
             if (poll_fd_array[i].revents & POLLIN)
             {
-                echo(poll_fd_array[i].fd);
+                if (echo(connect_fd) == 0)
+                {
+                    poll_fd_array[i].fd = -1;
+                    close_e(connect_fd);
+                }
             }
         }
     }

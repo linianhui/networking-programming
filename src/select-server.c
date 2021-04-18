@@ -1,21 +1,10 @@
 #include "cnp.h"
 
-void echo(int connect_fd)
+int echo(int connect_fd)
 {
     char buf[BUFFER_SIZE];
     bzero(buf, sizeof(buf));
-
-    int recv_size;
-
-    if ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
-    {
-        for (size_t i = 0; i < recv_size; i++)
-        {
-            buf[i] = toupper(buf[i]);
-        }
-
-        send_e(connect_fd, buf, recv_size + 1, 0);
-    }
+    return socket_revc_and_send(connect_fd, buf);
 }
 
 int main(int argc, char *argv[])
@@ -46,7 +35,12 @@ int main(int argc, char *argv[])
         bitmap_loop(
             connect_fd_set,
             if (FD_ISSET(i, &read_fd_set)) {
-                echo(i);
+                if (echo(i) == 0)
+                {
+                    // 对方断开了连接，那么则移除select，并且关闭连接
+                    bitmap_del(connect_fd_set, i);
+                    close_e(i);
+                }
             });
     }
 

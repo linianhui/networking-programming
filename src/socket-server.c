@@ -2,24 +2,19 @@
 
 void echo(int connect_fd)
 {
-    pid_t pid = getpid();
-
     char buf[BUFFER_SIZE];
-    bzero(buf, sizeof(buf));
-
     int recv_size;
 
-    // 读取接收的数据，阻塞
-    while ((recv_size = recv_e(connect_fd, buf, sizeof(buf), 0)) != 0)
+    while (1)
     {
-        for (size_t i = 0; i < recv_size; i++)
+        bzero(buf, sizeof(buf));
+        // 读取接收的数据，阻塞
+        recv_size = socket_revc_and_send(connect_fd, buf);
+        if (recv_size == 0)
         {
-            buf[i] = toupper(buf[i]);
+            break;
         }
-
-        send_e(connect_fd, buf, recv_size + 1, 0);
     }
-    log_debug("server pid %d connect_fd %d close connect\n", pid, connect_fd);
 }
 
 int main(int argc, char *argv[])

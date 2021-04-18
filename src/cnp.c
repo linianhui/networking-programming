@@ -56,8 +56,8 @@ int socket_e(int domain, int type, int protocol)
     int sockfd = socket(domain, type, protocol);
     if (sockfd == -1)
     {
-        log_error("SOCKET ERROR : create");
-        exit(1);
+        log_error("\nSOCKET ERROR : create");
+        return -1;
     }
     log_socket_socket(sockfd);
     return sockfd;
@@ -70,8 +70,8 @@ int bind_e(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(addr, ip_port);
-        log_error("SOCKET ERROR : bind %s", ip_port);
-        exit(2);
+        log_error("\nSOCKET ERROR : bind %s", ip_port);
+        return -1;
     }
     log_socket_bind(sockfd, addr);
     return result;
@@ -84,8 +84,8 @@ int listen_e(int sockfd, int backlog)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_local_ip_port(sockfd, ip_port);
-        log_error("SOCKET ERROR : listen %s", ip_port);
-        exit(3);
+        log_error("\nSOCKET ERROR : listen %s", ip_port);
+        return -1;
     }
     log_socket_listen(sockfd, backlog);
     return result;
@@ -98,8 +98,8 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(servaddr, ip_port);
-        log_error("SOCKET ERROR : connect %s", ip_port);
-        exit(4);
+        log_error("\nSOCKET ERROR : connect %s", ip_port);
+        return -1;
     }
     log_socket_connect(sockfd);
     return result;
@@ -112,8 +112,8 @@ int accept_e(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(cliaddr, ip_port);
-        log_error("SOCKET ERROR : accept %s", ip_port);
-        exit(5);
+        log_error("\nSOCKET ERROR : accept %s", ip_port);
+        return -1;
     }
     log_socket_accept(sockfd, connect_fd);
     return connect_fd;
@@ -126,8 +126,8 @@ ssize_t send_e(int sockfd, const void *buf, size_t len, int flags)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_remote_ip_port(sockfd, ip_port);
-        log_error("SOCKET ERROR : send to %s", ip_port);
-        exit(6);
+        log_error("\nSOCKET ERROR : send to %s", ip_port);
+        return -1;
     }
     log_socket_send(sockfd, (char *)buf);
     return size;
@@ -140,10 +140,15 @@ ssize_t recv_e(int sockfd, void *buf, size_t len, int flags)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_remote_ip_port(sockfd, ip_port);
-        log_error("SOCKET ERROR : recv from %s", ip_port);
-        exit(7);
+        log_error("\nSOCKET ERROR : recv from %s", ip_port);
+        return -1;
     }
     log_socket_recv(sockfd, (char *)buf);
+    // 0代表接收到了remote发送的FIN，代表关闭连接。
+    if (size == 0)
+    {
+        log_debug("FIN");
+    }
     return size;
 }
 
@@ -152,9 +157,10 @@ int close_e(int fd)
     int result = close(fd);
     if (result == -1)
     {
-        log_error("SOCKET ERROR : close");
-        exit(8);
+        log_error("\nSOCKET ERROR : close fd=%d", fd);
+        return -1;
     }
+    log_socket_close(fd);
     return result;
 }
 
@@ -278,6 +284,25 @@ int socket_create_connect(int argc, char *argv[])
     return connect_fd;
 }
 
+int socket_revc_and_send(int connect_fd, char *buf)
+{
+    int recv_size = recv_e(connect_fd, buf, sizeof(buf), 0);
+    if (recv_size == 0)
+    {
+        close_e(connect_fd);
+        return 0;
+    }
+
+    for (size_t i = 0; i < recv_size; i++)
+    {
+        buf[i] = toupper(buf[i]);
+    }
+
+    send_e(connect_fd, buf, recv_size + 1, 0);
+
+    return recv_size;
+}
+
 void log_stdin_prompt()
 {
     pid_t pid = getpid();
@@ -352,4 +377,9 @@ void log_socket_send(int connect_fd, char *send_buf)
     pid_t pid = getpid();
 
     log_debug("[SOCKET send] pid=%d connect_fd=%d send to %s : %s", pid, connect_fd, ip_port, send_buf);
+}
+
+void log_socket_close(int fd)
+{
+    log_debug("\n[SOCKET close] fd=%d", fd);
 }

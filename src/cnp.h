@@ -83,6 +83,8 @@ int socket_create_bind_listen(int argc, char *argv[]);
 
 int socket_create_connect(int argc, char *argv[]);
 
+int socket_revc_and_send(int connect_fd, char *buf);
+
 void log_stdin_prompt();
 
 void log_socket_socket(int sockfd);
@@ -98,3 +100,5 @@ void log_socket_accept(int listen_fd, int connect_fd);
 void log_socket_recv(int connect_fd, char *recv_buf);
 
 void log_socket_send(int connect_fd, char *send_buf);
+
+void log_socket_close(int fd);
