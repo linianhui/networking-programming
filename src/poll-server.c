@@ -1,4 +1,5 @@
 #include "cnp.h"
+#include <poll.h>
 
 void echo(int connect_fd)
 {
@@ -33,32 +34,42 @@ int main(int argc, char *argv[])
 {
     int listen_fd = socket_create_bind_listen(argc, argv);
 
-    bitmap *connect_fd_set = bitmap_init(1024);
+    int max_fd = 1025;
+    struct pollfd poll_fd_array[max_fd];
 
-    fd_set read_fd_set;
+    // 添加listen_fd, 关注POLLIN事件
+    poll_fd_array[0].fd = listen_fd;
+    poll_fd_array[0].events = POLLIN;
+
+    int fd_count = 1;
 
     while (1)
     {
-        // 每次都需要重新设置，因为select返回时会重置read_fd_set
-        FD_ZERO(&read_fd_set);
-        FD_SET(listen_fd, &read_fd_set);
-        bitmap_loop(connect_fd_set, FD_SET(i, &read_fd_set));
+        // 每次重新复制poll_fd_array到kernel
+        poll(poll_fd_array, fd_count, -1);
 
-        // 获取可读的fd，阻塞
-        select(connect_fd_set->len, &read_fd_set, NULL, NULL, NULL);
-
-        // 当listen_fd可读时，把获取的连接的fd放入connect_fd_set
-        if (FD_ISSET(listen_fd, &read_fd_set))
+        // 当listen_fd可读时，把获取的连接的fd放入poll_fd_array
+        if (poll_fd_array[0].revents & POLLIN)
         {
-            bitmap_set(connect_fd_set, accept_e(listen_fd, NULL, NULL));
+            poll_fd_array[fd_count].fd = accept_e(listen_fd, NULL, NULL);
+            poll_fd_array[fd_count].events = POLLIN;
+            fd_count++;
         }
 
-        // 循环检查connect fd是否可读，可读就用echo处理
-        bitmap_loop(
-            connect_fd_set,
-            if (FD_ISSET(i, &read_fd_set)) {
-                echo(i);
-            });
+        // 循环检查connect_fd是否可读，可读就用echo处理
+        // 从1开始是跳过0位置的listen_fd。
+        for (int i = 1; i < fd_count; i++)
+        {
+            if (poll_fd_array[i].fd < 0)
+            {
+                continue;
+            }
+            // 如果可读，就echo处理
+            if (poll_fd_array[i].revents & POLLIN)
+            {
+                echo(poll_fd_array[i].fd);
+            }
+        }
     }
 
     close_e(listen_fd);
