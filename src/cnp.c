@@ -132,7 +132,7 @@ ssize_t send_e(int connect_fd, const void *buf, size_t len, int flags)
     {
         char ip_port[IP_PORT_STRING_SIZE];
         get_remote_ip_port(connect_fd, ip_port);
-        log_error("\nSOCKET ERROR : connect_fd-%d send to %s", connect_fd, ip_port);
+        log_error("\nSOCKET ERROR : connect_fd=%d send to %s", connect_fd, ip_port);
         return -1;
     }
     log_socket_send(connect_fd, (char *)buf);
@@ -175,7 +175,7 @@ int getsockname_e(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     int result = getsockname(sockfd, addr, addrlen);
     if (result == -1)
     {
-        log_error("SOCKET ERROR : getsockname fd=%fd", sockfd);
+        log_error("SOCKET ERROR : getsockname fd=%d", sockfd);
         exit(9);
     }
     return result;
