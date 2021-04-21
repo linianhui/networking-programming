@@ -63,7 +63,7 @@ int socket_e(int domain, int type, int protocol)
     if (sockfd == -1)
     {
         log_error("\nSOCKET ERROR : create");
-        return -1;
+        exit(1);
     }
     log_socket_socket(sockfd);
     return sockfd;
@@ -77,7 +77,7 @@ int bind_e(int listen_fd, const struct sockaddr *addr, socklen_t addrlen)
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(addr, ip_port);
         log_error("\nSOCKET ERROR : listen_fd=%d bind %s", listen_fd, ip_port);
-        return -1;
+        exit(1);
     }
     log_socket_bind(listen_fd, addr);
     return result;
@@ -91,7 +91,7 @@ int listen_e(int listen_fd, int backlog)
         char ip_port[IP_PORT_STRING_SIZE];
         get_local_ip_port(listen_fd, ip_port);
         log_error("\nSOCKET ERROR : listen_fd=%d backlog=%d %s", listen_fd, backlog, ip_port);
-        return -1;
+        exit(1);
     }
     log_socket_listen(listen_fd, backlog);
     return result;
@@ -105,7 +105,7 @@ int connect_e(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen)
         char ip_port[IP_PORT_STRING_SIZE];
         get_ip_port(servaddr, ip_port);
         log_error("\nSOCKET ERROR : connect %s", ip_port);
-        return -1;
+        exit(1);
     }
     log_socket_connect(sockfd);
     return result;
