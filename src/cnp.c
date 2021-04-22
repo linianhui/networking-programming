@@ -389,3 +389,27 @@ void log_socket_close(int fd)
 {
     log_debug("\n[SOCKET close] fd=%d", fd);
 }
+
+void log_socket_pollfd(struct pollfd *pollfd_array, int count)
+{
+    struct pollfd *e;
+    for (int i = 0; i < count; i++)
+    {
+        e = &(pollfd_array[i]);
+        log_debug("\n[SOCKET poll] fd=%d events=%d revents=%d", e->fd, e->events, e->revents);
+    }
+    log_debug("\n");
+}
+
+#ifdef __linux__
+void log_socket_epoll_event(struct epoll_event *epoll_event_array, int count)
+{
+    struct epoll_event *e;
+    for (int i = 0; i < count; i++)
+    {
+        e = &(epoll_event_array[i]);
+        log_debug("\n[SOCKET epoll_wait] fd=%d events=%d", e->data.fd, e->events);
+    }
+    log_debug("\n");
+}
+#endif

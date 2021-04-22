@@ -11,6 +11,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include "bitmap.h"
+#include <poll.h>
+#ifdef __linux__
+#include <sys/epoll.h>
+#endif
 
 #define SERVER_PORT "12345"
 #define BUFFER_SIZE 128
@@ -102,3 +106,9 @@ void log_socket_recv(int connect_fd, char *recv_buf);
 void log_socket_send(int connect_fd, char *send_buf);
 
 void log_socket_close(int fd);
+
+void log_socket_pollfd(struct pollfd *pollfd_array, int count);
+
+#ifdef __linux__
+void log_socket_epoll_event(struct epoll_event *epoll_event_array, int count);
+#endif

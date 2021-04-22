@@ -42,6 +42,8 @@ void epoll_handler(int listen_fd)
 
         // 每次返回指定数量的可读fd
         epoll_wait(epoll_fd, event_array, event_count, -1);
+        log_socket_epoll_event(event_array, event_count);
+
         for (index = 0; index < event_count; index++)
         {
             fd = event_array[index].data.fd;

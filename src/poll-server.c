@@ -23,6 +23,7 @@ void poll_handler(int listen_fd)
     {
         // 每次重新复制poll_fd_array到kernel
         poll(poll_fd_array, fd_count, -1);
+        log_socket_pollfd(poll_fd_array,fd_count);
 
         // 当listen_fd可读时，把获取的连接的fd放入poll_fd_array
         if (poll_fd_array[0].revents & POLLIN)
