@@ -1,5 +1,4 @@
 #include "cnp.h"
-#include <sys/epoll.h>
 
 int echo(int connect_fd)
 {

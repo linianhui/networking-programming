@@ -1,5 +1,4 @@
 #include "cnp.h"
-#include <sys/epoll.h>
 
 void epoll_ctl_add(int epoll_fd, int fd)
 {

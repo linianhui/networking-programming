@@ -1,5 +1,4 @@
 #include "cnp.h"
-#include <poll.h>
 
 void cli(FILE *input, int connect_fd)
 {
