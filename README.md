@@ -1,3 +1,13 @@
+# dev 
+
+```sh
+# ubuntu
+sudo apt install build-essential
+
+# centos
+sudo yum groupinstall 'Development Tools'
+```
+
 # run
 
 ## local
